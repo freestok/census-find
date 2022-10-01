@@ -8,15 +8,19 @@
 #
 
 library(plumber)
+source("helper.R")
 
+con <- get_con()
 #* @apiTitle Plumber Example API
 #* @apiDescription Plumber example description.
 
 #* Echo back the input
-#* @param msg The message to echo
-#* @get /echo
-function(msg = "") {
-    list(msg = paste0("The message is: '", msg, "'"))
+#* @param type type of variables (ACS, DEC)
+#* @param year year of dataset
+#* @param level can be 'shallow' or 'all'
+#* @get /variables
+function(type, year, level) {
+  return (type)
 }
 
 #* Plot a histogram
@@ -35,10 +39,3 @@ function(a, b) {
     as.numeric(a) + as.numeric(b)
 }
 
-# Programmatically alter your API
-#* @plumber
-function(pr) {
-    pr %>%
-        # Overwrite the default serializer to return unboxed JSON
-        pr_set_serializer(serializer_unboxed_json())
-}
