@@ -1,2 +1,6 @@
 library(plumber)
-pr("server/plumber.R") |> pr_run() 
+library(here)
+readRenviron(here('server','.Renviron'))
+port <- Sys.getenv("plumber_port")
+plumb_file <- here('server', 'plumber.R')
+pr(plumb_file) |> pr_run(port=strtoi(port)) 
