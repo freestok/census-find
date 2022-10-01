@@ -14,11 +14,13 @@ print('Got con!')
 #* @param shallow can be true or false
 #* @get /variables
 function(type, year, shallow) {
+  # make sure all parameters are acceptable
   type_assert <- assert_help(type, c('acs5', 'pl', 'sf1'))
   year_assert <- assert_help(year, c('2010', '2020'))
   shallow_assert <- assert_help(shallow, c('TRUE','FALSE'))
   valid <- all(c(type_assert, year_assert, shallow_assert))
   if (valid) {
+    print(glue('Returning dataset {type}_{year}_vars'))
     return (get_variables(con, year, type, shallow))
   } else {
     stop()
