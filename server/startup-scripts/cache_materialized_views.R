@@ -4,7 +4,6 @@ library(dbplyr)
 
 cache_views <- function(tbl, cols, con) {
   # first drop materialized view if it already exists
-  drop_materialized <- 'DROP MATERIALIZED VIEW places_geojson;'
   tryCatch(
     expr = {
       query <- glue('DROP MATERIALIZED VIEW {tbl}_geojson;')
@@ -19,24 +18,45 @@ cache_views <- function(tbl, cols, con) {
   # create materialized views
   cols_str <- paste(cols, collapse = ',')
   print(cols_str)
-  query <- glue(
-    "CREATE MATERIALIZED VIEW {tbl}_geojson AS
-      SELECT stusps,
-        Json_build_object(
-          'type',
-          'FeatureCollection',
-          'features',
-          Json_agg(
-            St_asgeojson(t.*):: json
+  if (tbl == 'states') {
+    query <- glue(
+      "CREATE MATERIALIZED VIEW {tbl}_geojson AS
+        SELECT 
+          Jsonb_build_object(
+            'type',
+            'FeatureCollection',
+            'features',
+            Jsonb_agg(
+              St_asgeojson(t.*):: json
+            )
           )
-        )
-      FROM (
-        SELECT {cols_str}, geometry
-        FROM {tbl}
-      ) AS t
-  GROUP BY
-    stusps WITH data;"
-  )
+        FROM (
+          SELECT {cols_str}, 
+            ST_SimplifyPreserveTopology(geometry, .05) geometry
+          FROM {tbl}
+        ) AS t
+        WITH data;
+    ")
+  } else {
+   query <- glue(
+      "CREATE MATERIALIZED VIEW {tbl}_geojson AS
+        SELECT stusps,
+          Jsonb_build_object(
+            'type',
+            'FeatureCollection',
+            'features',
+            Jsonb_agg(
+              St_asgeojson(t.*):: json
+            )
+          )
+        FROM (
+          SELECT {cols_str}, geometry
+          FROM {tbl}
+        ) AS t
+        GROUP BY stusps
+        WITH data;
+    ")
+  }
   print(query)
   dbExecute(con, query)
 }

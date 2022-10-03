@@ -1,14 +1,21 @@
 library(dbplyr)
 library(stringr)
 library(glue)
+library(sf)
 
 geom_get <- function(con, type, state) {
-  table <- glue('{dataset}_{year}_vars')
-  query = glue('SELECT name, label, concept FROM {table}')
-  if (shallow == 'TRUE') {
-    query = glue('{query} WHERE tab = 0')
+  # query = glue('SELECT jsonb_build_object FROM {type}_geojson')
+  # if (type != 'states') {
+  #   query = glue("{query} WHERE stusps = '{state}'")
+  # } 
+  
+  # # return the results
+  # res <- dbGetQuery(con, query)
+  # jsonlite::fromJSON(res[[1]])
+  query <- glue("select name, geometry from {type}")
+  if (type != "states") {
+    query = glue("{query} WHERE stusps = '{state}'")
   }
-  
-  
-  dbGetQuery(con, query)
+  x = st_read(con, query = query)
+  geojsonsf::sf_geojson(x, digits=5)
 }

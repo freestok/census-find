@@ -1,7 +1,11 @@
 library(plumber)
 library(here)
+library(assertthat)
+library(sf)
+library(geojsonsf)
 source("helper.R")
-source(here('server','modules', 'variables.R'))
+source(here('modules', 'variables.R'))
+source(here('modules', 'geom.R'))
 
 con <- get_con()
 print('Got con!')
@@ -50,10 +54,23 @@ function(type, state=NULL) {
   
   # if everything is tip-top, then return the geoms
   if (all(type_assert, state_assert)) {
-    return(geom_get(type, state))
+    return(geom_get(con, type, state))
   } else {
     stop()
     return()
   }
 }
 
+#* @get /geom1
+function() {
+  x = st_read(con, query = "select stusps, geometry from states;")
+  print(head(x))
+  print(typeof(x))
+  # return (x)
+  sf_geojson(x, digits=5)
+  # res <- sf_geojson( x )
+  # print('res complete')
+  # res[[1]]
+  # res <- dbGetQuery(con, 'SELECT * FROM states2_geojson')
+  # jsonlite::fromJSON(res[[1]])
+}
