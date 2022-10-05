@@ -27,7 +27,13 @@ con <- dbPool(
 )
 
 # cache the geoms
-cache_geoms(con)
+cache_geom(con, 'states', tigris::states, 2020, 
+           c('GEOID', 'NAME', 'STUSPS'), 0.3)
+cache_geom(con, 'counties', tigris::counties, 2020, 
+           c('GEOID', 'NAME', 'STUSPS'), 0.3)
+cache_geom(con, 'places', tigris::places, 2020, 
+           c('GEOID', 'NAME', 'STUSPS'), 0.3)
+cache_tracts(con, 0.3)
 
 # cache the variables
 cache_vars('acs5', '2020', 1, con)

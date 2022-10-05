@@ -63,5 +63,7 @@ You can learn more in the
 To learn React, check out the [React documentation](https://reactjs.org/).
 
 # Random Notes
-https://www.flother.is/til/postgis-geojson/
-https://www.postgresqltutorial.com/postgresql-views/postgresql-materialized-views/
+- https://www.flother.is/til/postgis-geojson/
+- https://www.postgresqltutorial.com/postgresql-views/postgresql-materialized-views/  
+
+- on simplification https://github.com/r-spatial/sf/issues/381

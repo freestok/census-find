@@ -1,32 +1,39 @@
 library(tidyverse)
 library(tigris)
 library(sf)
+library(rmapshaper)
+library(glue)
 
-cache_geoms <- function(con) {
-  # get states dataset, only get the 50, not territories
-  all_states <-
-    c( 'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI', 
-       'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 
-       'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 
-       'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 
-       'WV', 'WI', 'WY' )
-  print('cache states')
-  states(year = 2020, cb = TRUE) |>
+all_states <-
+  c( 'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI', 
+     'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 
+     'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 
+     'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 
+     'WV', 'WI', 'WY' )
+
+geom_write <- function(df, con, name, simplify_factor) {
+  print(glue('Writing {name} to database'))
+  st_write(df, con, name, layer_options = "OVERWRITE=true")
+
+  print(glue('Writing {name}_simple to database'))
+  df |>
+    ms_simplify(simplify_factor) |>
+    st_write(con, glue('{name}_simple'), layer_options = "OVERWRITE=true")
+}
+
+cache_geom <- function(con, geom, tigris_func, year, selectors, simplify_factor) {
+  print(glue('Starting cache {geom}'))
+  df <- tigris_func(year = year, cb = TRUE) |>
     filter(STUSPS %in% all_states) |>
-    select(GEOID, NAME, STUSPS) |>
+    select(selectors) |>
     rename_all(.funs = tolower) |>
-    st_transform(4326) |>
-    st_write(con, 'states', layer_options = "OVERWRITE=true")
+    st_transform(4326)
   
-  # get counties
-  print('cache counties')
-  counties(cb = TRUE, year = 2020) |>
-    filter(STUSPS %in% all_states) |>
-    select(GEOID, NAME, STATE_NAME, STUSPS) |>
-    rename_all(.funs = tolower) |>
-    st_transform(4326) |>
-    st_write(con, 'counties', layer_options = "OVERWRITE=true")
-  
+  geom_write(df, con, geom, simplify_factor)
+  print(glue('Done caching {geom}'))
+}
+
+cache_tracts <- function(con, simplify_factor=0.5) {
   # get tracts
   print('cache tracts')
   tracts_list <- vector('list', length = length(all_states))
@@ -40,16 +47,6 @@ cache_geoms <- function(con) {
     
     tracts_list[[i]] <- tract_df
   }
-  bind_rows(tracts_list) |>
-    st_write(con, 'tracts', layer_options = "OVERWRITE=true")
-  
-  # get places
-  print('cache places')
-  places(cb = TRUE, year = 2020) |>
-    filter(STUSPS %in% all_states) |>
-    select(GEOID, NAME, STATE_NAME, STUSPS) |>
-    rename_all(.funs = tolower) |>
-    st_transform(4326) |>
-    st_write(con, 'places', layer_options = "OVERWRITE=true")
-  
+  tracts_sf <- bind_rows(tracts_list)
+  geom_write(tracts_sf, con, 'tracts', simplify_factor)
 }
