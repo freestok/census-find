@@ -4,7 +4,9 @@ library(assertthat)
 library(sf)
 library(geojsonsf)
 library(dbplyr)
-source(here('modules', "helper.R"))
+
+# custom function imports
+source(here('modules', 'helper.R'))
 source(here('modules', 'variables.R'))
 source(here('modules', 'geom.R'))
 
@@ -37,29 +39,7 @@ function(type, year, shallow) {
 #* @param type type of variables (ACS, DEC)
 #* @get /geom
 function(type, state=NULL) {
-  all_states <- c('AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 
-                  'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 
-                  'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 
-                  'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 
-                  'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 
-                  'WY')
-  acceptable_type <- c('counties', 'places', 'states', 'tracts', 'nation')
-  type_assert <- assert_help(type, acceptable_type)
-  
-  # if a state argument was passed, make sure it's in the list of all_states
-  # if there is nothing passed, then the assertion is true by default
-  state_assert <- TRUE
-  if (is.string(state)) {
-    state_assert <- assert_help(state, all_states)
-  }
-  
-  # if everything is tip-top, then return the geoms
-  if (all(type_assert, state_assert)) {
-    return(geom_get(con, type, state))
-  } else {
-    stop()
-    return()
-  }
+  geom_get(con, type, state)
 }
 
 #* Only meant to display geometries for the front-end map
@@ -95,8 +75,8 @@ function(req) {
   all_names <- dbGetQuery(con, query)
 
   # then assert the values of those arguments are valid
-  if (all(geom_assert, year_assert, dataset_assert)) {
-
+  if (!(all(geom_assert, year_assert, dataset_assert))) {
+    stop('Invalid Parameters')
   }
   
   return ('yo')
