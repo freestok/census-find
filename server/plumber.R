@@ -1,16 +1,16 @@
-library(plumber)
-library(here)
 library(assertthat)
-library(sf)
-library(geojsonsf)
 library(dbplyr)
+library(geojsonsf)
 library(glue)
+library(here)
+library(plumber)
+library(sf)
 
 # custom function imports
 source(here('modules', '__helper.R'))
-source(here('modules', 'variables.R'))
-source(here('modules', 'geom.R'))
 source(here('modules', 'data.R'))
+source(here('modules', 'geom.R'))
+source(here('modules', 'variables.R'))
 
 con <- get_con()
 config <- jsonlite::read_json(here('modules','config','config.json'))
