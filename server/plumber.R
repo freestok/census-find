@@ -7,11 +7,13 @@ library(dbplyr)
 library(glue)
 
 # custom function imports
-source(here('modules', 'helper.R'))
+source(here('modules', '__helper.R'))
 source(here('modules', 'variables.R'))
 source(here('modules', 'geom.R'))
+source(here('modules', 'data.R'))
 
 con <- get_con()
+config <- jsonlite::read_json(here('modules','config','config.json'))
 
 #* @apiTitle census-find api
 #* @apiDescription Helps power the front-end of census-find. Mainly returns data from the database
