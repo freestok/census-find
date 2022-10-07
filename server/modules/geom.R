@@ -12,7 +12,7 @@ geom_get <- function(con, type, state) {
   # # return the results
   # res <- dbGetQuery(con, query)
   # jsonlite::fromJSON(res[[1]])
-  query <- glue("select name, geometry from {type}_simple")
+  query <- glue("select name, geoid, geometry from {type}_simple")
   if (type != "states") {
     query = glue("{query} WHERE stusps = '{state}'")
   }

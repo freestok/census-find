@@ -3,7 +3,8 @@ library(here)
 library(assertthat)
 library(sf)
 library(geojsonsf)
-source("helper.R")
+library(dbplyr)
+source(here('modules', "helper.R"))
 source(here('modules', 'variables.R'))
 source(here('modules', 'geom.R'))
 
@@ -61,16 +62,43 @@ function(type, state=NULL) {
   }
 }
 
-#* @get /geom1
-function() {
-  x = st_read(con, query = "select stusps, geometry from states;")
-  print(head(x))
-  print(typeof(x))
-  # return (x)
-  sf_geojson(x, digits=5)
-  # res <- sf_geojson( x )
-  # print('res complete')
-  # res[[1]]
-  # res <- dbGetQuery(con, 'SELECT * FROM states2_geojson')
-  # jsonlite::fromJSON(res[[1]])
+#* Only meant to display geometries for the front-end map
+#* @post /data
+function(req) {
+  body <- req$body
+  body_args <- names(body)
+
+  # TODO determine the data structure, b/c maybe it should be something like:
+  # {
+  #   "acs5": {
+  #     "year": 2020,
+  #     "vars": []
+  #   },
+  #   "sf1": {
+  #     "year": 2010,
+  #     "vars": []
+  #   }
+  # }
+  # get the arguments
+  dataset <- body$dataset
+  year <- body$year
+  geoid <- body$geoid
+  geom <- body$geom
+
+  # assert the proper arguments are passed in
+  dataset_assert <- assert_help(body$dataset, c('acs5', 'pl', 'sf1'))
+  year_assert <- assert_help(body$year, c('2010', '2020'))
+  geom_assert <- assert_help(geom, c('states', 'tracts', 'counties', 'places'))
+
+  # TODO assert variables are valid
+  query <- glue('SELECT name FROM {dataset}_{year}_vars;')
+  all_names <- dbGetQuery(con, query)
+
+  # then assert the values of those arguments are valid
+  if (all(geom_assert, year_assert, dataset_assert)) {
+
+  }
+  
+  return ('yo')
 }
+
