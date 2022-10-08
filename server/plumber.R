@@ -14,6 +14,7 @@ source(here('modules', 'variables.R'))
 
 con <- get_con()
 config <- jsonlite::read_json(here('modules','config','config.json'))
+env <- list(con = con, config = config)
 
 #* @apiTitle census-find api
 #* @apiDescription Helps power the front-end of census-find. Mainly returns data from the database
@@ -24,19 +25,19 @@ config <- jsonlite::read_json(here('modules','config','config.json'))
 #* @param shallow can be true or false
 #* @get /variables
 function(type, year, shallow) {
-  variables_get(con, year, type, shallow)
+  variables_get(env, year, type, shallow)
 }
 
 #* Only meant to display geometries for the front-end map
 #* @param type type of variables (ACS, DEC)
 #* @get /geom
 function(type, state=NULL) {
-  geom_get(con, type, state)
+  geom_get(env, type, state)
 }
 
 #* Only meant to display geometries for the front-end map
 #* @post /data
 function(req) {
-  data_post(con, req)
+  data_post(env, req)
 }
 

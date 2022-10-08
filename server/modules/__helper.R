@@ -20,3 +20,10 @@ get_con <- function() {
 assert_help <- function(x, vals) {
   assertthat::are_equal(x %in% vals, TRUE)
 }
+
+helper_valid <- function(regex, value) {
+  valid <- grepl(regex, value)
+  if (!valid) {
+    stop('Invalid parameters')
+  }
+}
