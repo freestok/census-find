@@ -17,6 +17,11 @@ get_con <- function() {
   )
 }
 
+helper_get_census_key <- function() {
+  readRenviron('.Renviron')
+  Sys.getenv('census_key')
+}
+
 assert_help <- function(x, vals) {
   assertthat::are_equal(x %in% vals, TRUE)
 }

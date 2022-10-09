@@ -5,6 +5,8 @@ library(glue)
 library(here)
 library(plumber)
 library(sf)
+library(tidycensus)
+library(tidyverse)
 
 # custom function imports
 source(here('modules', '__helper.R'))
@@ -15,6 +17,10 @@ source(here('modules', 'variables.R'))
 con <- get_con()
 config <- jsonlite::read_json(here('modules','config','config.json'))
 env <- list(con = con, config = config)
+
+# register census key
+census_key = helper_get_census_key()
+census_api_key(census_key)
 
 #* @apiTitle census-find api
 #* @apiDescription Helps power the front-end of census-find. Mainly returns data from the database
