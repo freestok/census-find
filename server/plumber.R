@@ -42,8 +42,13 @@ function(type, state=NULL) {
 }
 
 #* Only meant to display geometries for the front-end map
-#* @post /data
+#* @post /data/acs
 function(req) {
-  data_post(env, req)
+  data_acs_post(req)
 }
 
+#* Only meant to display geometries for the front-end map
+#* @post /data/dec
+function(req) {
+  data_dec_post(req)
+}
