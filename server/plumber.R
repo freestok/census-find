@@ -14,7 +14,8 @@ source(here('modules', 'data.R'))
 source(here('modules', 'geom.R'))
 source(here('modules', 'variables.R'))
 
-con <- get_con()
+print(pr)
+# con <- get_con()
 config <- jsonlite::read_json(here('modules','config','config.json'))
 env <- list(con = con, config = config)
 
