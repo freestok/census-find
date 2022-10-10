@@ -13,6 +13,7 @@ source(here('modules', '__helper.R'))
 source(here('modules', 'data.R'))
 source(here('modules', 'geom.R'))
 source(here('modules', 'variables.R'))
+source(here('modules', 'templates.R'))
 
 print(pr)
 # con <- get_con()
@@ -52,4 +53,28 @@ function(req) {
 #* @post /data/dec
 function(req) {
   data_dec_post(req)
+}
+
+#* For returning templates to the user
+#* @param id ID of the template to be retrieved
+#* @get /templates/<id:int>
+function(id) {
+  templates_vars_get(con, id)
+}
+
+#* Return 
+#* @param category Return all or a certain subset of categories
+#* @get /templates/<category>
+function(category) {
+  templates_get(con, category)
+}
+
+#* For creating templates
+#* @post /templates
+function(req) {
+}
+
+#* For updating templates
+#* @put /templates
+function(req) {
 }
