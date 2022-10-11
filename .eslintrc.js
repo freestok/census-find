@@ -9,13 +9,24 @@ module.exports = {
   ],
   overrides: [
   ],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 'latest',
-    sourceType: 'module'
+    sourceType: 'module',
+    tsconfigRootDir: __dirname,
+    project: ["./tsconfig.json"], // could be tsconfig.json too
   },
   plugins: [
     'react'
   ],
   rules: {
-  }
+  },
+  ignorePatterns: [
+    '.eslintrc.js',
+    'src/test-utils.tsx',
+    'src/setupTests.ts',
+    'src/serviceWorker.ts',
+    'src/reportWebVitals.ts',
+    'src/react-app-env.d.ts',
+  ]
 }

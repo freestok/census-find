@@ -1,37 +1,39 @@
-import React, { FC } from 'react';
-import styles from './Home.module.scss';
+import React, { FC } from 'react'
+import styles from './Home.module.scss'
 import {
-  ChakraProvider,
+  // ChakraProvider,
   Box,
   Text,
   Link,
   VStack,
   Code,
-  Grid,
-  theme,
-} from "@chakra-ui/react"
-import { ResponsiveBar } from '@nivo/bar'
-import { ColorModeSwitcher } from "./../../ColorModeSwitcher"
-import { Logo } from "./../../Logo"
+  Grid
+  // theme,
+} from '@chakra-ui/react'
+// import { ResponsiveBar } from '@nivo/bar'
+import { ColorModeSwitcher } from './../../ColorModeSwitcher'
+import { Logo } from './../../Logo'
+import Navbar from '../Navbar/Navbar'
 
-interface HomeProps {}
+// interface HomeProps {}
 
-const Home: FC<HomeProps> = () => (
-  <div className={styles.Home} data-testid="Home">
-    <Box textAlign="center" fontSize="xl">
-      <Grid minH="100vh" p={3}>
-        <ColorModeSwitcher justifySelf="flex-end" />
+const Home: FC = () => (
+  <div className={styles.Home} data-testid='Home'>
+    <Navbar />
+    <Box textAlign='center' fontSize='xl'>
+      <Grid minH='100vh' p={3}>
+        <ColorModeSwitcher justifySelf='flex-end' />
         <VStack spacing={8}>
-          <Logo h="40vmin" pointerEvents="none" />
+          <Logo h='40vmin' pointerEvents='none' />
           <Text>
-            Edit <Code fontSize="xl">src/App.tsx</Code> and save to reload.
+            Edit <Code fontSize='xl'>src/App.tsx</Code> and save to reload.
           </Text>
           <Link
-            color="teal.500"
-            href="https://chakra-ui.com"
-            fontSize="2xl"
-            target="_blank"
-            rel="noopener noreferrer"
+            color='teal.500'
+            href='https://chakra-ui.com'
+            fontSize='2xl'
+            target='_blank'
+            rel='noopener noreferrer'
           >
             Learn Chakra
           </Link>
@@ -39,6 +41,6 @@ const Home: FC<HomeProps> = () => (
       </Grid>
     </Box>
   </div>
-);
+)
 
-export default Home;
+export default Home

@@ -1,14 +1,14 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import Home from './Home'
+import Navbar from './Navbar'
 
-describe('<Home />', () => {
+describe('<Navbar />', () => {
   test('it should mount', () => {
-    render(<Home />)
+    render(<Navbar />)
 
-    const home = screen.getByTestId('Home')
+    const navbar = screen.getByTestId('Navbar')
 
-    expect(home).toBeInTheDocument()
+    expect(navbar).toBeInTheDocument()
   })
 })
