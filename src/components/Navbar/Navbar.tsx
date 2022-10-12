@@ -1,27 +1,19 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+// /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import React, { FC, ReactNode } from 'react'
+import React, { FC } from 'react'
 
 import styles from './Navbar.module.scss'
 import {
   Box,
   Flex,
-  Avatar,
-  HStack,
-  Link,
-  IconButton,
-  Button,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  MenuDivider,
   useDisclosure,
   useColorModeValue,
   Stack,
-  Center
+  Center,
+  Link,
+  IconButton,
+  HStack
 } from '@chakra-ui/react'
-import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
 import { FaBars, FaWindowClose } from 'react-icons/fa'
 import { ColorModeSwitcher } from '../../ColorModeSwitcher'
 
@@ -46,7 +38,7 @@ const Navbar: FC<any> = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
-    <>
+    <div className={styles.Navbar} data-testid="Navbar">
       <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
           <IconButton
@@ -57,7 +49,9 @@ const Navbar: FC<any> = () => {
             onClick={isOpen ? onClose : onOpen}
           />
           <HStack spacing={8} alignItems={'center'}>
-            <Box>Logo</Box>
+            {/* <Box>
+              Logo placeholder
+            </Box> */}
             <HStack
               as={'nav'}
               spacing={4}
@@ -106,7 +100,7 @@ const Navbar: FC<any> = () => {
             )
           : null}
       </Box>
-    </>
+    </div>
   )
 }
 

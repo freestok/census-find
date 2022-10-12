@@ -4,16 +4,20 @@ import {
 } from '@chakra-ui/react'
 import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Home from './components/Home/Home'
+import Explore from './components/Explore/Explore'
 import Navbar from './components/Navbar/Navbar'
+import Query from './components/Query/Query'
+import Templates from './components/Templates/Templates'
 
 export const App = (): any => (
   <ChakraProvider theme={theme}>
     <Navbar />
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={<Home/>} />
-        <Route path='/explore' element={<Home/>} />
+        <Route path='/' element={<Explore/>} />
+        <Route path='/explore' element={<Explore/>} />
+        <Route path='/templates' element={<Templates/>} />
+        <Route path='/query' element={<Query/>} />
       </Routes>
     </BrowserRouter>
   </ChakraProvider>

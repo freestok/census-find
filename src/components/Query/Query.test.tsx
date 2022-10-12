@@ -1,14 +1,14 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import Home from './Home'
+import Query from './Query'
 
-describe('<Home />', () => {
+describe('<Query />', () => {
   test('it should mount', () => {
-    render(<Home />)
+    render(<Query />)
 
-    const home = screen.getByTestId('Home')
+    const query = screen.getByTestId('Query')
 
-    expect(home).toBeInTheDocument()
+    expect(query).toBeInTheDocument()
   })
 })
