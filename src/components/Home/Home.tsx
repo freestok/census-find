@@ -1,28 +1,22 @@
 import React, { FC } from 'react'
 import styles from './Home.module.scss'
 import {
-  // ChakraProvider,
   Box,
   Text,
   Link,
   VStack,
   Code,
   Grid
-  // theme,
 } from '@chakra-ui/react'
 // import { ResponsiveBar } from '@nivo/bar'
-import { ColorModeSwitcher } from './../../ColorModeSwitcher'
 import { Logo } from './../../Logo'
-import Navbar from '../Navbar/Navbar'
 
 // interface HomeProps {}
 
 const Home: FC = () => (
   <div className={styles.Home} data-testid='Home'>
-    <Navbar />
     <Box textAlign='center' fontSize='xl'>
       <Grid minH='100vh' p={3}>
-        <ColorModeSwitcher justifySelf='flex-end' />
         <VStack spacing={8}>
           <Logo h='40vmin' pointerEvents='none' />
           <Text>
