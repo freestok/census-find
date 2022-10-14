@@ -24,6 +24,15 @@ env <- list(con = con, config = config)
 census_key = helper_get_census_key()
 census_api_key(census_key)
 
+# -------------------------- FILTERS ------------------------------------------
+#* @filter cors
+cors <- function(res) {
+    res$setHeader("Access-Control-Allow-Origin", "*")
+    plumber::forward()
+}
+
+# -------------------------- END POINTS----------------------------------------
+
 #* @apiTitle census-find api
 #* @apiDescription Helps power the front-end of census-find. Mainly returns data from the database
 
@@ -41,6 +50,12 @@ function(type, year, shallow) {
 #* @get /geom
 function(type, state=NULL) {
   geom_get(env, type, state)
+}
+
+#* Get all geometry names for searching purposes
+#* @get /geom/names/<type>
+function(type) {
+  geom_get_names(env, type)
 }
 
 #* Only meant to display geometries for the front-end map
