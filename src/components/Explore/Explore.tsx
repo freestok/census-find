@@ -12,20 +12,21 @@ interface GeomNameQuery {
   name: string
   geoid: string
   stusps: string
+  link?: string
 }
 
 interface CensusGeoms {
-  states: GeomNameQuery[]
-  counties: GeomNameQuery[]
-  places: GeomNameQuery[]
-  tracts: GeomNameQuery[]
+  state: GeomNameQuery[]
+  county: GeomNameQuery[]
+  place: GeomNameQuery[]
+  tract: GeomNameQuery[]
 }
 
 interface Templates {
   id: number
   title: string
 }
-type GeomTypes = 'states' | 'counties' | 'places' | 'tracts'
+type GeomTypes = 'state' | 'county' | 'place' | 'tract'
 
 const DropdownLabel: FC<any> = ({ text }) => (
   <Flex
@@ -39,8 +40,9 @@ const DropdownLabel: FC<any> = ({ text }) => (
 )
 const Explore: FC<any> = () => {
   const [censusNames, setCensusNames] = useState<CensusGeoms>({} as any)
-  const [activeGeom, setActiveGeom] = useState<GeomTypes>('states')
+  const [activeGeom, setActiveGeom] = useState<GeomTypes>('state')
   const [activeState, setActiveState] = useState<any>('AL')
+  const [activeTemplate, setActiveTemplate] = useState<number>(0)
   const [filteredData, setFilteredData] = useState<GeomNameQuery[]>([])
   const [userSearch, setUserSearch] = useState('')
   const [templates, setTemplates] = useState<Templates[]>()
@@ -62,16 +64,18 @@ const Explore: FC<any> = () => {
     }))
   }
   const getGeographyNames = async (): Promise<void> => {
-    await getGeomInfo('http://127.0.0.1:9090/geom/names/states', 'states')
-    await getGeomInfo('http://127.0.0.1:9090/geom/names/counties', 'counties')
-    await getGeomInfo('http://127.0.0.1:9090/geom/names/places', 'places')
-    await getGeomInfo('http://127.0.0.1:9090/geom/names/tracts', 'tracts')
+    await getGeomInfo('http://127.0.0.1:9090/geom/names/states', 'state')
+    await getGeomInfo('http://127.0.0.1:9090/geom/names/counties', 'county')
+    await getGeomInfo('http://127.0.0.1:9090/geom/names/places', 'place')
+    await getGeomInfo('http://127.0.0.1:9090/geom/names/tracts', 'tract')
   }
 
   const getTemplates = async (): Promise<void> => {
     const res = await axios.get('http://127.0.0.1:9090/templates/primary')
-    setTemplates(res.data)
-    console.log('template!', res)
+    const data: Templates[] = res.data
+    setTemplates(data)
+    setActiveTemplate(data[0].id)
+    console.log('res.data.id', data[0].id)
   }
 
   useEffect(() => {
@@ -88,13 +92,19 @@ const Explore: FC<any> = () => {
     const data = censusNames[activeGeom]
     let filtered = data.filter((e: GeomNameQuery) => (
       e.name.toLowerCase().includes(searchVal) ||
-      e.geoid.includes(searchVal)
+      e.geoid.includes(searchVal) ||
+      e.stusps.toLowerCase().includes(searchVal)
     ))
-    if (activeGeom !== 'states') {
+    if (activeGeom !== 'state') {
       filtered = filtered.filter((e: GeomNameQuery) => e.stusps === activeState)
     }
+
+    // assign link info
+    for (const row of filtered) {
+      row.link = `/data/${row.geoid}?template=${activeTemplate}&type=${activeGeom}`
+    }
     setFilteredData(filtered)
-    setUserSearch(searchVal)
+    setUserSearch(event.target.value)
   }
 
   const geographySelectOnChange = (event: any): void => {
@@ -151,10 +161,10 @@ const Explore: FC<any> = () => {
                 <Stack direction={'row'} align={'center'}>
                   <DropdownLabel text='Geography Type:' />
                   <Select onChange={geographySelectOnChange}>
-                    <option value='states' defaultValue='states'>State</option>
-                    <option value='counties'>County</option>
-                    <option value='tracts'>Tracts</option>
-                    <option value='places'>Places</option>
+                    <option value='state' defaultValue='state'>State</option>
+                    <option value='county'>County</option>
+                    <option value='tract'>Tracts</option>
+                    <option value='place'>Places</option>
                   </Select>
                 </Stack>
                 <Stack direction={'row'} align={'center'}>
@@ -206,7 +216,7 @@ const Explore: FC<any> = () => {
           </Center>
 
         </GridItem>
-        <GridItem ml={2} mr={2} colSpan={4}>
+        <GridItem colSpan={4}>
           {/* table results */}
           <Center>
             <Box
@@ -218,10 +228,12 @@ const Explore: FC<any> = () => {
               p={6}
               textAlign={'center'}>
               <DataTable
-                columns={['Name', 'GEOID', 'State Abrv.']}
+                columnHeaders={['Name', 'GEOID', 'State Abrv.']}
+                columns={['name', 'geoid', 'stusps']}
                 data={filteredData}
                 maxLength={250}
-                showData={userSearch !== ''} />
+                showData={userSearch !== ''}
+                link={true}/>
             </Box>
           </Center>
 
