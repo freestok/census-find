@@ -1,18 +1,49 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { Grid, GridItem, Text, Stack, Center, Button, Box, Heading, Link, Avatar, Input, Table, TableCaption, TableContainer, Tbody, Td, Tfoot, Th, Thead, Tr, HStack, Select } from '@chakra-ui/react'
+import { Grid, GridItem, Text, Stack, Center, Divider, Button, Box, Heading, useColorModeValue, Link, Avatar, Input, Table, TableCaption, TableContainer, Tbody, Td, Tfoot, Th, Thead, Tr, HStack, Select, Flex, StackDivider } from '@chakra-ui/react'
 import React, { FC, useEffect, useState } from 'react'
 import styles from './Explore.module.scss'
 import axios from 'axios'
+import DataTable from '../DataTable/DataTable'
 
 // interface ExploreProps {}
 
+interface GeomNameQuery {
+  name: string
+  geoid: string
+  stusps: string
+}
+
+interface CensusGeoms {
+  states: GeomNameQuery[]
+  counties: GeomNameQuery[]
+  places: GeomNameQuery[]
+  tracts: GeomNameQuery[]
+}
+
+interface Templates {
+  id: number
+  title: string
+}
+type GeomTypes = 'states' | 'counties' | 'places' | 'tracts'
+
+const DropdownLabel: FC<any> = ({ text }) => (
+  <Flex
+    w={20}
+    h={8}
+    align={'center'}
+    justify={'center'}
+    rounded={'full'}>
+    <Text>{text}</Text>
+  </Flex>
+)
 const Explore: FC<any> = () => {
-  const [states, setStates] = useState([])
-  const [counties, setCounties] = useState([])
-  const [places, setPlaces] = useState([])
-  const [tracts, setTracts] = useState([])
-  const [activeGeom, setActiveGeom] = useState([])
+  const [censusNames, setCensusNames] = useState<CensusGeoms>({} as any)
+  const [activeGeom, setActiveGeom] = useState<GeomTypes>('states')
+  const [activeState, setActiveState] = useState<any>('AL')
+  const [filteredData, setFilteredData] = useState<GeomNameQuery[]>([])
+  const [userSearch, setUserSearch] = useState('')
+  const [templates, setTemplates] = useState<Templates[]>()
 
   const stateNames = ['AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI',
     'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN',
@@ -20,39 +51,68 @@ const Explore: FC<any> = () => {
     'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA',
     'WV', 'WI', 'WY']
 
-  const getGeographyNames = async (): Promise<void> => {
-    const statesRes = await axios.get('http://127.0.0.1:9090/geom/names/states')
-    setStates(statesRes.data)
-    setActiveGeom(statesRes.data)
-
-    const countiesRes = await axios.get('http://127.0.0.1:9090/geom/names/counties')
-    setCounties(countiesRes.data)
-    const tractsRes = await axios.get('http://127.0.0.1:9090/geom/names/tracts')
-    setTracts(tractsRes.data)
-    const placesRes = await axios.get('http://127.0.0.1:9090/geom/names/places')
-    setPlaces(placesRes.data)
-
-    console.log('statesRes', statesRes)
-    console.log('states', states)
+  const getGeomInfo = async (url: string, name: GeomTypes): Promise<void> => {
+    const res = await axios.get(url)
+    const updatedValObj = { ...censusNames }
+    updatedValObj[name] = res.data
+    // something[name] = val
+    setCensusNames(censusNames => ({
+      ...censusNames,
+      ...updatedValObj
+    }))
   }
+  const getGeographyNames = async (): Promise<void> => {
+    await getGeomInfo('http://127.0.0.1:9090/geom/names/states', 'states')
+    await getGeomInfo('http://127.0.0.1:9090/geom/names/counties', 'counties')
+    await getGeomInfo('http://127.0.0.1:9090/geom/names/places', 'places')
+    await getGeomInfo('http://127.0.0.1:9090/geom/names/tracts', 'tracts')
+  }
+
+  const getTemplates = async (): Promise<void> => {
+    const res = await axios.get('http://127.0.0.1:9090/templates/primary')
+    setTemplates(res.data)
+    console.log('template!', res)
+  }
+
   useEffect(() => {
     getGeographyNames()
       .then(() => console.log('getGeographyNames complete'))
       .catch(err => console.error(err))
+    getTemplates()
+      .then(() => console.log('getTemplates complete'))
+      .catch(err => console.error(err))
   }, [])
 
   const handleChange = (event: any): void => {
-    console.log(event.target.value)
+    const searchVal = event.target.value.toLowerCase()
+    const data = censusNames[activeGeom]
+    let filtered = data.filter((e: GeomNameQuery) => (
+      e.name.toLowerCase().includes(searchVal) ||
+      e.geoid.includes(searchVal)
+    ))
+    if (activeGeom !== 'states') {
+      filtered = filtered.filter((e: GeomNameQuery) => e.stusps === activeState)
+    }
+    setFilteredData(filtered)
+    setUserSearch(searchVal)
   }
 
   const geographySelectOnChange = (event: any): void => {
-    console.log('event', event)
-    const val = event.target.value
-    if (val === 'counties') setActiveGeom(counties)
-    else if (val === 'states') setActiveGeom(states)
-    else if (val === 'places') setActiveGeom(places)
-    else if (val === 'tracts') setActiveGeom(tracts)
+    setActiveGeom(event.target.value)
+    setFilteredData([])
+    setUserSearch('')
   }
+
+  const stateSelectOnChange = (event: any): void => {
+    setActiveState(event.target.value)
+    setFilteredData([])
+    setUserSearch('')
+  }
+
+  const templateSelectOnChange = (event: any): void => {
+    console.log('event', event)
+  }
+
   return (
     <div className={styles.Explore} data-testid="Explore">
       <Grid
@@ -77,34 +137,48 @@ const Explore: FC<any> = () => {
                 Search for a Place
               </Heading>
               <Text fontWeight={600} color={'gray.500'} mb={4}>
-                e.g. state, county, census tract, place
+                by name or GEOID
               </Text>
               <Input
-                // value={value}
+                value={userSearch}
                 onChange={handleChange}
                 variant='filled'
                 placeholder='Search'
                 size='md'
                 mb={5}
               />
-              <HStack>
-                <Text>Geography Type:</Text>
-                <Select onChange={geographySelectOnChange}>
-                  <option value='states' defaultValue='states'>State</option>
-                  <option value='counties'>County</option>
-                  <option value='tracts'>Tracts</option>
-                  <option value='places'>Places</option>
-                </Select>
-              </HStack>
-              <HStack>
-                <Text>State:</Text>
-                <Select>
-                  <option key={'AL'} value={'AL'}>AL</option>
-                  {stateNames.map(e => (
-                    <option key={e} value={e}>{e}</option>
-                  ))}
-                </Select>
-              </HStack>
+              <Stack spacing={8}>
+                <Stack direction={'row'} align={'center'}>
+                  <DropdownLabel text='Geography Type:' />
+                  <Select onChange={geographySelectOnChange}>
+                    <option value='states' defaultValue='states'>State</option>
+                    <option value='counties'>County</option>
+                    <option value='tracts'>Tracts</option>
+                    <option value='places'>Places</option>
+                  </Select>
+                </Stack>
+                <Stack direction={'row'} align={'center'}>
+                  <DropdownLabel text='State:' />
+                  <Select onChange={stateSelectOnChange}>
+                    <option key={'AL'} value={'AL'}>AL</option>
+                    {stateNames.map(e => (
+                      <option key={e} value={e}>{e}</option>
+                    ))}
+                  </Select>
+                </Stack>
+                <Divider
+                    borderColor={useColorModeValue('gray.300', 'gray.700')}
+                  />
+                <Stack direction={'row'} align={'center'}>
+                  <DropdownLabel text='Template:' />
+                  <Select onChange={templateSelectOnChange}>
+                    {templates?.map(e => (
+                      <option key={e.id} value={e.id}>{e.title}</option>
+                    ))}
+                  </Select>
+                </Stack>
+              </Stack>
+
               <Stack mt={8} direction={'row'} spacing={4}>
                 {/* search button */}
                 {/* <Button
@@ -132,7 +206,7 @@ const Explore: FC<any> = () => {
           </Center>
 
         </GridItem>
-        <GridItem colSpan={4}>
+        <GridItem ml={2} mr={2} colSpan={4}>
           {/* table results */}
           <Center>
             <Box
@@ -143,28 +217,11 @@ const Explore: FC<any> = () => {
               rounded={'lg'}
               p={6}
               textAlign={'center'}>
-
-              <TableContainer>
-                <Table variant='striped' colorScheme='gray'>
-                  <TableCaption>Imperial to metric conversion factors</TableCaption>
-                  <Thead>
-                    <Tr>
-                      <Th>Name</Th>
-                      <Th>GEOID</Th>
-                      <Th>State Abrv.</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {activeGeom.map((e: any) => (
-                      <Tr key={e.goid}>
-                        <Td>{e.name}</Td>
-                        <Td>{e.geoid}</Td>
-                        <Td>{e.stusps}</Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              </TableContainer>
+              <DataTable
+                columns={['Name', 'GEOID', 'State Abrv.']}
+                data={filteredData}
+                maxLength={250}
+                showData={userSearch !== ''} />
             </Box>
           </Center>
 
