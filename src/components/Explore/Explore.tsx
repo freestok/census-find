@@ -233,7 +233,8 @@ const Explore: FC<any> = () => {
                 data={filteredData}
                 maxLength={250}
                 showData={userSearch !== ''}
-                link={true}/>
+                link={true}
+                spinnerForNoData={false}/>
             </Box>
           </Center>
 

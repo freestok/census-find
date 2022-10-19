@@ -1,11 +1,16 @@
 data_acs_post <- function(req) {
   body <- req$body
-  
+  print(body$geography)
+  print(body$survey)
+  # print(body$variables)
+  print(body$state)
+  print(body$county)
+  print(body$year)
   # get acs or decennial (only these for now)
   # geography can be tract, county, state, or place (for now)
   get_acs(
     geography = body$geography,
-    survey    = body$table,
+    survey    = body$survey,
     variables = body$variables,
     state     = body$state,
     county    = body$county,
@@ -27,7 +32,7 @@ data_dec_post <- function(req) {
   # now get the data
   get_decennial(
     geography = body$geography,
-    survey    = body$table,
+    survey    = body$survey,
     variables = body$variables,
     state     = body$state,
     county    = body$county,

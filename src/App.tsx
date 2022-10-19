@@ -4,6 +4,7 @@ import {
 } from '@chakra-ui/react'
 import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import CensusData from './components/CensusData/CensusData'
 import Explore from './components/Explore/Explore'
 import Navbar from './components/Navbar/Navbar'
 import Query from './components/Query/Query'
@@ -18,6 +19,7 @@ export const App = (): any => (
         <Route path='/explore' element={<Explore/>} />
         <Route path='/templates' element={<Templates/>} />
         <Route path='/query' element={<Query/>} />
+        <Route path='/data/:geoid' element={<CensusData/>} />
       </Routes>
     </BrowserRouter>
   </ChakraProvider>

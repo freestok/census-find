@@ -26,9 +26,19 @@ census_api_key(census_key)
 
 # -------------------------- FILTERS ------------------------------------------
 #* @filter cors
-cors <- function(res) {
-    res$setHeader("Access-Control-Allow-Origin", "*")
+cors <- function(req, res) {
+  
+  res$setHeader("Access-Control-Allow-Origin", "*")
+  
+  if (req$REQUEST_METHOD == "OPTIONS") {
+    res$setHeader("Access-Control-Allow-Methods","*")
+    res$setHeader("Access-Control-Allow-Headers", req$HTTP_ACCESS_CONTROL_REQUEST_HEADERS)
+    res$status <- 200 
+    return(list())
+  } else {
     plumber::forward()
+  }
+  
 }
 
 # -------------------------- END POINTS----------------------------------------
@@ -58,13 +68,13 @@ function(type) {
   geom_get_names(env, type)
 }
 
-#* Only meant to display geometries for the front-end map
+#* retrieve ACS data
 #* @post /data/acs
 function(req) {
   data_acs_post(req)
 }
 
-#* Only meant to display geometries for the front-end map
+#* retrieve decennial data
 #* @post /data/dec
 function(req) {
   data_dec_post(req)

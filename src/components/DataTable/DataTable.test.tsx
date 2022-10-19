@@ -6,7 +6,7 @@ import DataTable from './DataTable'
 describe('<DataTable />', () => {
   test('it should mount', () => {
     render(<DataTable columns={['a', 'b', 'c']}
-      data={[]} showData={true} columnHeaders={['a', 'b', 'c']}/>)
+      data={[]} showData={true} columnHeaders={['a', 'b', 'c']} spinnerForNoData={false}/>)
 
     const dataTable = screen.getByTestId('DataTable')
 

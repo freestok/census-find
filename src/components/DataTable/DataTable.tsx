@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { LinkBox, LinkOverlay, TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Link, useColorModeValue } from '@chakra-ui/react'
+import { Spinner, LinkBox, LinkOverlay, TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Link, useColorModeValue } from '@chakra-ui/react'
 import React, { FC } from 'react'
 import styles from './DataTable.module.scss'
 
@@ -11,15 +11,16 @@ interface DataTableProps {
   showData: boolean
   maxLength?: number
   link?: boolean
+  spinnerForNoData: boolean
 }
 
 const TableBody: FC<any> = ({ data, columns }) => (
   <Tbody key={1}>
     {data.map((row: any) => {
       return (row.link === undefined)
-        ? <Tr key={row}>
+        ? <Tr key={row[columns[0]]}>
             {columns.map((key: any) => (
-              <Td key={row[key]}>{row[key]}</Td>
+              <Td key={key}>{row[key]}</Td>
             ))}
         </Tr>
         : <LinkBox key={row.link} as={Tr}
@@ -40,13 +41,16 @@ const TableBody: FC<any> = ({ data, columns }) => (
     })}
   </Tbody>
 )
-const DataTable: FC<DataTableProps> = ({ data, columns, maxLength, showData, columnHeaders }) => (
+const DataTable: FC<DataTableProps> = ({ data, columns, maxLength, showData, columnHeaders, spinnerForNoData }) => (
   <div className={styles.DataTable} data-testid="DataTable">
     <TableContainer>
       <Table variant='striped' colorScheme='gray'>
         {maxLength !== undefined && data.length > maxLength
           ? <TableCaption>Over {maxLength} results, refine your search </TableCaption>
-          : <TableCaption>Search Results </TableCaption>
+          : <TableCaption>
+              Search Results
+               {(!showData && spinnerForNoData) ? <Spinner ml={4} /> : null}
+            </TableCaption>
         }
         <Thead>
           <Tr>
