@@ -45,7 +45,7 @@ const CensusData: FC<any> = () => {
     const surveyType = templateInfo[0].survey
     let countyFips
     if (geogType === 'tract') {
-      countyFips = id.slice(0, 5) // might be 2, 5
+      countyFips = id.slice(2, 5)
     }
     const payload = {
       geography: geogType,
@@ -63,8 +63,8 @@ const CensusData: FC<any> = () => {
         const perc = row.percent as number
         const moePerc = row.moe_perc as number
         row.estimate = row.estimate.toLocaleString()
-        row.percent = `${perc.toFixed(2)}%`
-        row.moePerc = moePerc !== undefined ? `${moePerc.toFixed(2)}%` : null
+        row.percent = `${perc.toFixed(1)}%`
+        row.moe_perc = moePerc !== undefined ? `${moePerc.toFixed(1)}%` : null
         row.moe = row.moe !== undefined ? row.moe.toLocaleString() : null
       }
       setCensusData(result.data)
