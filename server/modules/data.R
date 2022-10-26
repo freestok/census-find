@@ -8,7 +8,7 @@ data_acs_post <- function(req) {
   print(body$year)
   # get acs or decennial (only these for now)
   # geography can be tract, county, state, or place (for now)
-  get_acs(
+  data <- get_acs(
     geography = body$geography,
     survey    = body$survey,
     variables = body$variables,
@@ -24,6 +24,17 @@ data_acs_post <- function(req) {
     mutate(percent = 100 * (estimate / group_max),
            moe_perc = 100 * (moe / estimate)) |>
     select(-NAME, -group_max, -var_group)
+
+  # grab all variable names and query to get their descriptive names
+  variables_collapse = paste(data$variable, collapse = "','")
+  new_query = glue("
+    SELECT * FROM acs5_2020_vars
+    WHERE name IN ('{variables_collapse}');
+  ")
+  query_res = dbGetQuery(con, new_query) |> rename(variable = name)
+
+  # return the join with the descriptive information
+  left_join(data, query_res, 'variable')
 }
 
 data_dec_post <- function(req) {

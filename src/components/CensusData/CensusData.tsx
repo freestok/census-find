@@ -14,6 +14,19 @@ interface TemplateInfo {
   var: string
   year: number
 }
+
+interface AcsResult {
+  GEOID: string
+  variable: string
+  estimate: number
+  moe: number
+  percent: number
+  moe_perc: number
+  label: string
+  concept: string
+  tab: number
+}
+
 const CensusData: FC<any> = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [censusData, setCensusData] = useState([])
@@ -60,14 +73,15 @@ const CensusData: FC<any> = () => {
     console.log('surveyType', surveyType)
     if (surveyType.includes('acs')) {
       const result = await axios.post('http://127.0.0.1:9090/data/acs', payload)
-      for (const row of result.data) {
-        const perc = row.percent as number
-        const moePerc = row.moe_perc as number
-        row.estimate = row.estimate.toLocaleString()
-        row.percent = `${perc.toFixed(1)}%`
-        row.moe_perc = moePerc !== undefined ? `${moePerc.toFixed(1)}%` : null
-        row.moe = row.moe !== undefined ? row.moe.toLocaleString() : null
-      }
+      console.log('result', JSON.parse(JSON.stringify(result)))
+      // const data: AcsResult[] = result.data
+      // for (const row of result.data) {
+      //   const perc = row.percent.toFixed(1)
+      //   row.estimate = row.estimate.toLocaleString()
+      //   row.percent = `${perc}%`
+      //   row.moe_perc = row.moe_perc !== undefined ? `${row.moe_perc.toFixed(1)}%` : null
+      //   row.moe = row.moe !== undefined ? row.moe.toLocaleString() : null
+      // }
       setCensusData(result.data)
       console.log('result!', result)
     } else if (surveyType === 'sf1') {
@@ -81,13 +95,8 @@ const CensusData: FC<any> = () => {
   return (
     <div className={styles.CensusData} data-testid="CensusData">
       <CensusDataTable
-        columnHeaders={['Variable', 'Estimate', 'Percent', 'MoE', 'MoE %']}
-        columns={['variable', 'estimate', 'percent', 'moe', 'moe_perc']}
         data={censusData}
-        maxLength={100000000}
-        showData={censusData.length > 0}
-        spinnerForNoData={true}/>
-
+        showData={censusData.length > 0}/>
     </div>
   )
 }
