@@ -5,6 +5,7 @@ import styles from './CensusData.module.scss'
 import { useSearchParams, useParams } from 'react-router-dom'
 import axios from 'axios'
 import DataTable from '../DataTable/DataTable'
+import CensusDataTable from '../CensusDataTable/CensusDataTable'
 
 // interface CensusDataProps {}
 
@@ -79,7 +80,7 @@ const CensusData: FC<any> = () => {
 
   return (
     <div className={styles.CensusData} data-testid="CensusData">
-      <DataTable
+      <CensusDataTable
         columnHeaders={['Variable', 'Estimate', 'Percent', 'MoE', 'MoE %']}
         columns={['variable', 'estimate', 'percent', 'moe', 'moe_perc']}
         data={censusData}
