@@ -22,7 +22,7 @@ const CensusData: FC<any> = () => {
     getCensusData()
       .then(() => console.log('getCensusData complete'))
       .catch(err => console.error(err))
-  }, [searchParams, params.geoid])
+  }, [searchParams, params.geoid, params.type])
   useEffect(() => {
     console.log('refresh!')
   }, [censusData])
@@ -41,7 +41,7 @@ const CensusData: FC<any> = () => {
     // }
     const id = params.geoid as string
     const vars = templateInfo.map(e => e.var)
-    const geogType = searchParams.get('type') as string
+    const geogType = params.type as string
     const surveyType = templateInfo[0].survey
     let countyFips
     if (geogType === 'tract') {

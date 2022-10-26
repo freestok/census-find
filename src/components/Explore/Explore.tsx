@@ -101,7 +101,7 @@ const Explore: FC<any> = () => {
 
     // assign link info
     for (const row of filtered) {
-      row.link = `/data/${row.geoid}?template=${activeTemplate}&type=${activeGeom}`
+      row.link = `/data/${activeGeom}/${row.geoid}?template=${activeTemplate}`
     }
     setFilteredData(filtered)
     setUserSearch(event.target.value)

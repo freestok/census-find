@@ -19,7 +19,7 @@ export const App = (): any => (
         <Route path='/explore' element={<Explore/>} />
         <Route path='/templates' element={<Templates/>} />
         <Route path='/query' element={<Query/>} />
-        <Route path='/data/:geoid' element={<CensusData/>} />
+        <Route path='/data/:type/:geoid' element={<CensusData/>} />
       </Routes>
     </BrowserRouter>
   </ChakraProvider>
