@@ -14,7 +14,8 @@ data_acs_post <- function(req) {
     variables = body$variables,
     state     = body$state,
     county    = body$county,
-    year      = body$year
+    year      = body$year,
+    cache     = TRUE
   ) |>
     filter(GEOID == body$geoid) |>
     mutate(var_group = str_extract(variable, '^[^_]+(?=_)')) |>

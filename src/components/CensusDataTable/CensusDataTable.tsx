@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { TableContainer, Table, TableCaption, Spinner, Thead, Tr, Th, LinkBox, LinkOverlay, Tbody, Td, useColorModeValue } from '@chakra-ui/react'
+import { Heading, TableContainer, Table, TableCaption, Spinner, Thead, Tr, Th, LinkBox, LinkOverlay, Tbody, Td, useColorModeValue, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Slider, SliderFilledTrack, SliderThumb, SliderTrack } from '@chakra-ui/react'
 import React, { FC } from 'react'
 import styles from './CensusDataTable.module.scss'
 
@@ -21,32 +21,11 @@ interface CensusDataTableProps {
   showData: boolean
 }
 
-interface TableBodyProps {
-  data: AcsResult[]
-}
-
-const TableBody: FC<TableBodyProps> = ({ data }) => (
-  <Tbody key={1}>
-    {data.map((row) => (
-      <Tr key={row.variable}>
-        <Td>{row.label}</Td>
-        <Td>{row.estimate}</Td>
-        <Td>{row.percent}</Td>
-        <Td>{row.moe}</Td>
-        <Td>{row.moe_perc}</Td>
-      </Tr>
-    ))}
-  </Tbody>
-)
-
-const CensusDataTable: FC<CensusDataTableProps> = ({ data, showData }) => (
-  <div className={styles.CensusDataTable} data-testid="CensusDataTable">
+const TableGroup: FC<any> = ({ data }) => (
+  <>
+    <Heading m={5}>{data[0].concept}</Heading>
     <TableContainer>
       <Table variant='striped' colorScheme='gray'>
-        <TableCaption>
-          Search Results
-          {!showData ? <Spinner ml={4} /> : null}
-        </TableCaption>
         <Thead>
           <Tr>
             <Th>Variable</Th>
@@ -56,13 +35,40 @@ const CensusDataTable: FC<CensusDataTableProps> = ({ data, showData }) => (
             <Th>MoE %</Th>
           </Tr>
         </Thead>
-        {(showData) &&
-          <TableBody data={data} />
-        }
+        <Tbody key={1}>
+          {data.map((row: any) => (
+            <Tr key={row.variable}>
+              <Td pl={4 + (row.tab * 6)}>{row.label}</Td>
+              <Td>{row.estimate?.toLocaleString()}</Td>
+              <Td>{row.percent?.toFixed(1)}%</Td>
+              <Td>{row.moe?.toLocaleString()}</Td>
+              <Td>{row.moe_perc?.toFixed(1)}%</Td>
+            </Tr>
+          ))}
+        </Tbody>
       </Table>
     </TableContainer>
-
-  </div>
+  </>
 )
+
+const CensusDataTable: FC<CensusDataTableProps> = ({ data, showData }) => {
+  const masterArray = []
+  const uniqueConcepts = [...new Set(data.map(item => item.concept))]
+
+  for (const concept of uniqueConcepts) {
+    const conceptGroup = data.filter(e => e.concept === concept)
+    masterArray.push(conceptGroup)
+  }
+
+  console.log('masterArray', masterArray)
+  return (
+  <div className={styles.CensusDataTable} data-testid="CensusDataTable">
+                  {/* FOR TESTING */}
+    { masterArray.map(group => (
+      <TableGroup key={group[0].concept} data={group}/>
+    ))}
+  </div>
+  )
+}
 
 export default CensusDataTable

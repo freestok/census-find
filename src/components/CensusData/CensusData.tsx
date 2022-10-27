@@ -14,19 +14,6 @@ interface TemplateInfo {
   var: string
   year: number
 }
-
-interface AcsResult {
-  GEOID: string
-  variable: string
-  estimate: number
-  moe: number
-  percent: number
-  moe_perc: number
-  label: string
-  concept: string
-  tab: number
-}
-
 const CensusData: FC<any> = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [censusData, setCensusData] = useState([])
