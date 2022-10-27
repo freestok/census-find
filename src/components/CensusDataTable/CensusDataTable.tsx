@@ -41,7 +41,7 @@ const TableGroup: FC<any> = ({ data }) => (
               <Td pl={4 + (row.tab * 6)}>{row.label}</Td>
               <Td>{row.estimate?.toLocaleString()}</Td>
               <Td>{row.percent?.toFixed(1)}%</Td>
-              <Td>{row.moe?.toLocaleString()}</Td>
+              <Td>{row.moe !== undefined ? '± ' : ''}{row.moe?.toLocaleString()}</Td>
               <Td>{row.moe_perc?.toFixed(1)}{row.moe_perc !== undefined ? '%' : ''}</Td>
             </Tr>
           ))}
