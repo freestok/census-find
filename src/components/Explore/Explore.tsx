@@ -109,6 +109,8 @@ const Explore: FC<any> = () => {
 
   const geographySelectOnChange = (event: any): void => {
     setActiveGeom(event.target.value)
+    console.log(event.target.value)
+    console.log(activeGeom)
     setFilteredData([])
     setUserSearch('')
   }
@@ -167,7 +169,8 @@ const Explore: FC<any> = () => {
                     <option value='place'>Places</option>
                   </Select>
                 </Stack>
-                <Stack direction={'row'} align={'center'}>
+                <Stack direction={'row'} align={'center'}
+                  hidden={activeGeom === 'state'}>
                   <DropdownLabel text='State:' />
                   <Select onChange={stateSelectOnChange}>
                     <option key={'AL'} value={'AL'}>AL</option>
