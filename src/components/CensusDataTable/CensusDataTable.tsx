@@ -1,6 +1,18 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { Text, Heading, TableContainer, Table, TableCaption, Spinner, Thead, Tr, Th, LinkBox, LinkOverlay, Tbody, Td, useColorModeValue, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Slider, SliderFilledTrack, SliderThumb, SliderTrack, Center, Stack } from '@chakra-ui/react'
+import {
+  Text,
+  Heading,
+  TableContainer,
+  Table,
+  Spinner,
+  Thead,
+  Tr,
+  Th,
+  Tbody,
+  Td,
+  Center,
+  Stack
+} from '@chakra-ui/react'
 import React, { FC } from 'react'
 import styles from './CensusDataTable.module.scss'
 

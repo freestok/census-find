@@ -1,6 +1,17 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-import { Grid, GridItem, Text, Stack, Center, Divider, Button, Box, Heading, useColorModeValue, Link, Avatar, Input, Table, TableCaption, TableContainer, Tbody, Td, Tfoot, Th, Thead, Tr, HStack, Select, Flex, StackDivider } from '@chakra-ui/react'
+import {
+  Grid,
+  GridItem,
+  Text,
+  Stack,
+  Center,
+  Divider,
+  Box,
+  Heading,
+  useColorModeValue,
+  Input,
+  Select,
+  Flex
+} from '@chakra-ui/react'
 import React, { FC, useEffect, useState } from 'react'
 import styles from './Explore.module.scss'
 import axios from 'axios'

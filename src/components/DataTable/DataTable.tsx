@@ -1,6 +1,17 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-import { Spinner, LinkBox, LinkOverlay, TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Link, useColorModeValue } from '@chakra-ui/react'
+import {
+  Spinner,
+  LinkBox,
+  LinkOverlay,
+  TableContainer,
+  Table,
+  TableCaption,
+  Thead,
+  Tr,
+  Th,
+  Tbody,
+  Td,
+  useColorModeValue
+} from '@chakra-ui/react'
 import React, { FC } from 'react'
 import styles from './DataTable.module.scss'
 
