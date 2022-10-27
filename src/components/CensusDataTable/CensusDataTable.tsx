@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { Heading, TableContainer, Table, TableCaption, Spinner, Thead, Tr, Th, LinkBox, LinkOverlay, Tbody, Td, useColorModeValue, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Slider, SliderFilledTrack, SliderThumb, SliderTrack } from '@chakra-ui/react'
+import { Text, Heading, TableContainer, Table, TableCaption, Spinner, Thead, Tr, Th, LinkBox, LinkOverlay, Tbody, Td, useColorModeValue, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Slider, SliderFilledTrack, SliderThumb, SliderTrack, Center, Stack } from '@chakra-ui/react'
 import React, { FC } from 'react'
 import styles from './CensusDataTable.module.scss'
 
@@ -42,7 +42,7 @@ const TableGroup: FC<any> = ({ data }) => (
               <Td>{row.estimate?.toLocaleString()}</Td>
               <Td>{row.percent?.toFixed(1)}%</Td>
               <Td>{row.moe?.toLocaleString()}</Td>
-              <Td>{row.moe_perc?.toFixed(1)}%</Td>
+              <Td>{row.moe_perc?.toFixed(1)}{row.moe_perc !== undefined ? '%' : ''}</Td>
             </Tr>
           ))}
         </Tbody>
@@ -63,7 +63,16 @@ const CensusDataTable: FC<CensusDataTableProps> = ({ data, showData }) => {
   console.log('masterArray', masterArray)
   return (
   <div className={styles.CensusDataTable} data-testid="CensusDataTable">
-                  {/* FOR TESTING */}
+    {(!showData)
+      ? <Center mt={5}>
+      <Stack>
+        <Text>Loading Data</Text>
+        <Center>
+          <Spinner ml={4} />
+        </Center>
+      </Stack>
+    </Center>
+      : null}
     { masterArray.map(group => (
       <TableGroup key={group[0].concept} data={group}/>
     ))}
