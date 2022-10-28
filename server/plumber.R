@@ -50,56 +50,62 @@ cors <- function(req, res) {
 #* @param type dataset the user wants 
 #* @param year year of dataset
 #* @param shallow can be true or false
-#* @get /variables
+#* @get /api/variables
 function(type, year, shallow) {
   variables_get(env, year, type, shallow)
 }
 
 #* Only meant to display geometries for the front-end map
 #* @param type type of variables (ACS, DEC)
-#* @get /geom
+#* @get /api/geom
 function(type, state=NULL) {
   geom_get(env, type, state)
 }
 
 #* Get all geometry names for searching purposes
-#* @get /geom/names/<type>
+#* @get /api/geom/names/<type>
 function(type) {
   geom_get_names(env, type)
 }
 
 #* retrieve ACS data
-#* @post /data/acs
+#* @post /api/data/acs
 function(req) {
   data_acs_post(req)
 }
 
 #* retrieve decennial data
-#* @post /data/dec
+#* @post /api/data/dec
 function(req) {
   data_dec_post(req)
 }
 
 #* For returning templates to the user
 #* @param id ID of the template to be retrieved
-#* @get /templates/<id:int>
+#* @get /api/templates/<id:int>
 function(id) {
   templates_vars_get(con, id)
 }
 
 #* Return 
 #* @param category Return all or a certain subset of categories
-#* @get /templates/<category>
+#* @get /api/templates/<category>
 function(category) {
   templates_get(con, category)
 }
 
 #* For creating templates
-#* @post /templates
+#* @post /api/templates
 function(req) {
 }
 
 #* For updating templates
-#* @put /templates
+#* @put /api/templates
 function(req) {
+}
+
+#* Return the config
+#* @get /api/config
+function() {
+  config
 }

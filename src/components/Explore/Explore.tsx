@@ -75,14 +75,14 @@ const Explore: FC<any> = () => {
     }))
   }
   const getGeographyNames = async (): Promise<void> => {
-    await getGeomInfo('http://127.0.0.1:9090/geom/names/states', 'state')
-    await getGeomInfo('http://127.0.0.1:9090/geom/names/counties', 'county')
-    await getGeomInfo('http://127.0.0.1:9090/geom/names/places', 'place')
-    await getGeomInfo('http://127.0.0.1:9090/geom/names/tracts', 'tract')
+    await getGeomInfo('/api/geom/names/states', 'state')
+    await getGeomInfo('/api/geom/names/counties', 'county')
+    await getGeomInfo('/api/geom/names/places', 'place')
+    await getGeomInfo('/api/geom/names/tracts', 'tract')
   }
 
   const getTemplates = async (): Promise<void> => {
-    const res = await axios.get('http://127.0.0.1:9090/templates/primary')
+    const res = await axios.get('/api/templates/primary')
     const data: Templates[] = res.data
     setTemplates(data)
     setActiveTemplate(data[0].id)
@@ -150,7 +150,7 @@ const Explore: FC<any> = () => {
             <Box
               // maxW={'320px'}
               w={'full'}
-              // bg={useColorModeValue('white', 'gray.900')}
+              bg={useColorModeValue('white', 'gray.900')}
               boxShadow={'2xl'}
               rounded={'lg'}
               p={6}
@@ -232,11 +232,11 @@ const Explore: FC<any> = () => {
         </GridItem>
         <GridItem colSpan={4}>
           {/* table results */}
-          <Center>
+          <Center py={6}>
             <Box
               maxW={'500px'}
               w={'full'}
-              // bg={useColorModeValue('white', 'gray.900')}
+              bg={useColorModeValue('white', 'gray.900')}
               boxShadow={'2xl'}
               rounded={'lg'}
               p={6}

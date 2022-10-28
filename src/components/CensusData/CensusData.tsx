@@ -30,7 +30,7 @@ const CensusData: FC<any> = () => {
   const getCensusData = async (): Promise<void> => {
     console.log('useEffect triggered!!!')
     const templateId = searchParams.get('template') as string
-    const res = await axios.get(`http://127.0.0.1:9090/templates/${templateId}`)
+    const res = await axios.get(`/api/templates/${templateId}`)
     const templateInfo: TemplateInfo[] = res.data
 
     // TODO let there be mixed years within a template
@@ -58,7 +58,7 @@ const CensusData: FC<any> = () => {
     }
     console.log('surveyType', surveyType)
     if (surveyType.includes('acs')) {
-      const result = await axios.post('http://127.0.0.1:9090/data/acs', payload)
+      const result = await axios.post('/api/data/acs', payload)
       console.log('result', JSON.parse(JSON.stringify(result)))
       // const data: AcsResult[] = result.data
       // for (const row of result.data) {
