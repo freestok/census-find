@@ -23,15 +23,16 @@ interface DataTableProps {
   maxLength?: number
   link?: boolean
   spinnerForNoData: boolean
+  clickEvent?: Function
 }
 
-const TableBody: FC<any> = ({ data, columns }) => (
+const TableBody: FC<any> = ({ data, columns, clickEvent }) => (
   <Tbody key={1}>
     {data.map((row: any) => {
       return (row.link === undefined)
         ? <Tr key={row[columns[0]]}>
-            {columns.map((key: any) => (
-              <Td key={key}>{row[key]}</Td>
+            {columns.map((key: string) => (
+              <Td key={row[key]} onClick={() => clickEvent(row)}>{row[key]}</Td>
             ))}
         </Tr>
         : <LinkBox key={row.link} as={Tr}
@@ -52,7 +53,7 @@ const TableBody: FC<any> = ({ data, columns }) => (
     })}
   </Tbody>
 )
-const DataTable: FC<DataTableProps> = ({ data, columns, maxLength, showData, columnHeaders, spinnerForNoData }) => (
+const DataTable: FC<DataTableProps> = ({ data, columns, maxLength, showData, columnHeaders, spinnerForNoData, clickEvent }) => (
   <div className={styles.DataTable} data-testid="DataTable">
     <TableContainer>
       <Table variant='striped' colorScheme='gray'>
@@ -71,7 +72,7 @@ const DataTable: FC<DataTableProps> = ({ data, columns, maxLength, showData, col
           </Tr>
         </Thead>
         {(showData && maxLength !== undefined && data.length < maxLength) &&
-          <TableBody data={data} columns={columns} />
+          <TableBody data={data} columns={columns} clickEvent={clickEvent}/>
         }
       </Table>
     </TableContainer>
