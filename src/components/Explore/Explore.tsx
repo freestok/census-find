@@ -82,7 +82,7 @@ const Explore: FC<any> = () => {
   }
 
   const getTemplates = async (): Promise<void> => {
-    const res = await axios.get('/api/templates/primary')
+    const res = await axios.get('/api/templates/all')
     const data: Templates[] = res.data
     setTemplates(data)
     setActiveTemplate(data[0].id)
@@ -132,9 +132,7 @@ const Explore: FC<any> = () => {
     setUserSearch('')
   }
 
-  const templateSelectOnChange = (event: any): void => {
-    console.log('event', event)
-  }
+  const templateSelectOnChange = (event: any): void => setActiveTemplate(event.target.value)
 
   return (
     <div className={styles.Explore} data-testid="Explore">

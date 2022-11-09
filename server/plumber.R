@@ -97,11 +97,13 @@ function(category) {
 #* For creating templates
 #* @post /api/templates
 function(req) {
+  templates_post(con, req)
 }
 
 #* For updating templates
 #* @put /api/templates
 function(req) {
+  templates_post(con, req)
 }
 
 #* Return the config

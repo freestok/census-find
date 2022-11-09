@@ -71,6 +71,7 @@ const CensusData: FC<any> = () => {
       setCensusData(result.data)
       console.log('result!', result)
     } else if (surveyType === 'sf1') {
+      // TODO implement decennial logic
       console.log('decennial data')
     }
     console.log('payload', payload)

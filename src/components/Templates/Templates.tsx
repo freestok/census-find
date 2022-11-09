@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 import React, { FC, useEffect, useState } from 'react'
 import {
@@ -67,10 +68,10 @@ const Templates: FC<any> = () => {
   const [years, setYears] = useState<any>()
   const [activeYear, setActiveYear] = useState<any>()
   const [varList, setVarList] = useState<any>()
-  const [activeVar, setActiveVar] = useState<any>()
   const [filteredData, setFilteredData] = useState<any[]>([])
   const [highLevelList, setHighLevelList] = useState<any[]>([])
-  const [showXIcon, setShowXIcon] = useState(false)
+  const [templateName, setTemplateName] = useState<string>('')
+
   const setVariablesFromConfig = async (): Promise<void> => {
     console.log('get variables')
     const res = await axios.get('/api/config')
@@ -108,9 +109,7 @@ const Templates: FC<any> = () => {
   }
 
   const yearOnChange = (event: any): void => setActiveYear(event.target.value)
-  const varOnClick = (event: any): void => console.log(event)
-  const btnMouseEnter = (): void => setShowXIcon(true)
-  const btnMouseLeave = (): void => setShowXIcon(false)
+  const handleTemplateName = (event: any): void => setTemplateName(event.target.value)
   const handleSearchChange = (event: any): void => {
     const searchVal = event.target.value.toLowerCase()
     // const data = censusNames[activeGeom]
@@ -119,8 +118,6 @@ const Templates: FC<any> = () => {
   }
 
   const removeHighLevelList = (record: any, index: number): void => {
-    // record.disabled = false
-    // const recordMatch = filteredData.find(e => e.name === record.name)
     // loop over the todos list and find the provided id.
     const updatedList = filteredData.map((item: any) => {
       if (item.name === record.name) {
@@ -134,6 +131,27 @@ const Templates: FC<any> = () => {
       ...highLevelList.slice(0, index),
       ...highLevelList.slice(index + 1)
     ])
+  }
+
+  const handleFinish = (): void => {
+    const vars = highLevelList.map(e => `${e.name.split('_')[0]}_`)
+    const payload = {
+      year: activeYear,
+      variables: vars,
+      template: templateName,
+      survey: activeDataset.name[0],
+      variableYear: activeDataset.varYear[0]
+    }
+    // const result = await axios.post('/api/templates', payload)
+    console.log('payload', payload)
+    postTemplate(payload)
+      .then(() => console.log('postTemplate complete'))
+      .catch(e => console.error(e))
+  }
+
+  const postTemplate = async (payload: any): Promise<void> => {
+    const result = await axios.post('/api/templates', payload)
+    console.log('result', result)
   }
 
   useEffect(() => {
@@ -179,26 +197,20 @@ const Templates: FC<any> = () => {
                 </Select>
               }
               {varList !== undefined &&
-              //   <Select onChange={varOnChange}>
-              //   {activeVar === undefined && <option value=''> </option>}
-              //   {varList.map((e: any) => (
-              //     <option key={e.name} value={e.name}>{e.concept}</option>
-              //   ))}
-              // </Select>
-              <>
-                <Heading size='md'>Click a button to add to your template</Heading>
-                <Input
-                  // value={userSearch}
-                  onChange={handleSearchChange}
-                  variant='filled'
-                  placeholder='Filter by searching for a variable'
-                  size='md'
-                  mb={5}
-                />
-                <Box maxHeight='70vh' overflow='auto' overflowX='scroll' maxWidth='100rem'>
-                <VariableTable data={filteredData} setHighLevelList={setHighLevelList}/>
-                </Box>
-              </>
+                <>
+                  <Heading size='md'>Click a button to add to your template</Heading>
+                  <Input
+                    // value={userSearch}
+                    onChange={handleSearchChange}
+                    variant='filled'
+                    placeholder='Filter by searching for a variable'
+                    size='md'
+                    mb={5}
+                  />
+                  <Box maxHeight='70vh' overflow='auto' overflowX='scroll' maxWidth='100rem'>
+                  <VariableTable data={filteredData} setHighLevelList={setHighLevelList}/>
+                  </Box>
+                </>
             }
             </Stack>
 
@@ -213,34 +225,31 @@ const Templates: FC<any> = () => {
             rounded={'lg'}
             p={6}
             textAlign={'center'}>
-            <Box maxHeight='100vh' overflow='auto' overflowX='auto' maxWidth='100rem'>
-              <Heading size='lg' mb={5}>Template Overview</Heading>
-              <Stack align='start'>
-                {highLevelList.map((e: any, index: number) => (
-                  // <ButtonGroup size='sm' isAttached variant='outline' key={e}>
-                  //   <IconButton aria-label='Add to friends' icon={<FaRegTimesCircle />} />
-                  //   <Button disabled={true}>{e}</Button>
-                  // </ButtonGroup>
-                  <Button textAlign={'left'} leftIcon={<FaRegTimesCircle />} key={e.name} onClick={() => removeHighLevelList(e, index)}>
-                    {e.concept}
-                  </Button>
-                  // <Button key={e}
-                  //   onMouseEnter={btnMouseEnter}
-                  //   onMouseLeave={btnMouseLeave}
-                  //   onClick={() => removeHighLevelList(index)}>
-                  //    {/* {showXIcon
-                  //      ? <Icon as={FaRegTimesCircle} />
-                  //      : <>{e}</>
-                  //   } */}
-                  //   {/* <>
-                  //     <Text hidden={showXIcon}>{e}</Text>
-                  //     <Icon visibility={showXIcon ? 'visible' : 'hidden'} position='absolute' textAlign={'center'} as={FaRegTimesCircle} />
-                  //   </> */}
+              <Stack>
+                <Heading size='lg' mb={5}>Template Overview</Heading>
+                <Text>Enter a name for your template and click finish once complete.</Text>
+                <Stack direction={'row'}>
+                  <Input placeholder='Template Name' onChange={handleTemplateName}/>
+                  {/* <Center> */}
+                    <Button colorScheme='green' width='5em' mb={3}
+                      onClick={handleFinish}
+                      disabled={(highLevelList.length < 1 || activeYear === undefined || templateName === '') && true}>
+                        Finish
+                    </Button>
 
-                  // </Button>
-                ))}
+                  {/* </Center> */}
+                </Stack>
+                <Divider/>
+                <Box maxHeight='100vh' overflow='auto' overflowX='auto' maxWidth='100rem'>
+                  <Stack align='start'>
+                    {highLevelList.map((e: any, index: number) => (
+                      <Button textAlign={'left'} leftIcon={<FaRegTimesCircle />} key={e.name} onClick={() => removeHighLevelList(e, index)}>
+                        {e.concept}
+                      </Button>
+                    ))}
+                  </Stack>
+                </Box>
               </Stack>
-            </Box>
           </Box>
 
         </GridItem>
