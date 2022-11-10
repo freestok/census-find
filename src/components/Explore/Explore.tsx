@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import {
   Grid,
   GridItem,
@@ -10,12 +12,17 @@ import {
   useColorModeValue,
   Input,
   Select,
-  Flex
+  Flex,
+  IconButton,
+  Spacer
 } from '@chakra-ui/react'
 import React, { FC, useEffect, useState } from 'react'
 import styles from './Explore.module.scss'
 import axios from 'axios'
 import DataTable from '../DataTable/DataTable'
+import { Map, Marker } from 'pigeon-maps'
+import { FaGlobeAmericas, FaTable } from 'react-icons/fa'
+import ExploreMap from '../ExploreMap/ExploreMap'
 
 // interface ExploreProps {}
 
@@ -57,6 +64,7 @@ const Explore: FC<any> = () => {
   const [filteredData, setFilteredData] = useState<GeomNameQuery[]>([])
   const [userSearch, setUserSearch] = useState('')
   const [templates, setTemplates] = useState<Templates[]>()
+  const [searchType, setSearchType] = useState('table')
 
   const stateNames = ['AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI',
     'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN',
@@ -154,17 +162,28 @@ const Explore: FC<any> = () => {
               p={6}
               textAlign={'center'}>
 
-              <Heading fontSize={'2xl'} fontFamily={'body'}>
+              <Stack direction='row' mb={5}>
+                <Text>Map or Table Search</Text>
+                <Spacer />
+                <IconButton aria-label='Search database' icon={<FaTable />}
+                  colorScheme={searchType === 'table' ? 'blue' : 'gray'}
+                  onClick={() => setSearchType('table')}/>
+                <IconButton aria-label='Search database' icon={<FaGlobeAmericas />}
+                  colorScheme={searchType === 'map' ? 'blue' : 'gray'}
+                  onClick={() => setSearchType('map')}/>
+              </Stack>
+              <Heading fontSize={'2xl'} fontFamily={'body'} mb={4}>
                 Search for a Place
               </Heading>
-              <Text fontWeight={600} color={'gray.500'} mb={4}>
+              {/* <Text fontWeight={600} color={'gray.500'} mb={4}>
                 by name or GEOID
-              </Text>
+              </Text> */}
+
               <Input
                 value={userSearch}
                 onChange={handleChange}
                 variant='filled'
-                placeholder='Search'
+                placeholder='Search by name or GEOID'
                 size='md'
                 mb={5}
               />
@@ -200,55 +219,35 @@ const Explore: FC<any> = () => {
                   </Select>
                 </Stack>
               </Stack>
-
-              <Stack mt={8} direction={'row'} spacing={4}>
-                {/* search button */}
-                {/* <Button
-                flex={1}
-                fontSize={'md'}
-                rounded={'full'}
-                // maxW={'150px'}
-
-                bg={'blue.400'}
-                color={'white'}
-                boxShadow={
-                  '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
-                }
-                _hover={{
-                  bg: 'blue.500'
-                }}
-                _focus={{
-                  bg: 'blue.500'
-                }}>
-                Search
-              </Button> */}
-              </Stack>
             </Box>
 
           </Center>
 
         </GridItem>
-        <GridItem colSpan={4}>
+        <GridItem colSpan={4} h='88vh'>
           {/* table results */}
-          <Center py={6}>
-            <Box
-              maxW={'500px'}
-              w={'full'}
-              bg={useColorModeValue('white', 'gray.900')}
-              boxShadow={'2xl'}
-              rounded={'lg'}
-              p={6}
-              textAlign={'center'}>
-              <DataTable
-                columnHeaders={['Name', 'GEOID', 'State Abrv.']}
-                columns={['name', 'geoid', 'stusps']}
-                data={filteredData}
-                maxLength={250}
-                showData={userSearch !== ''}
-                link={true}
-                spinnerForNoData={false}/>
-            </Box>
-          </Center>
+          {searchType === 'table'
+            ? <Center py={6}>
+              <Box
+                maxW={'500px'}
+                w={'full'}
+                bg={useColorModeValue('white', 'gray.900')}
+                boxShadow={'2xl'}
+                rounded={'lg'}
+                p={6}
+                textAlign={'center'}>
+                <DataTable
+                  columnHeaders={['Name', 'GEOID', 'State Abrv.']}
+                  columns={['name', 'geoid', 'stusps']}
+                  data={filteredData}
+                  maxLength={250}
+                  showData={userSearch !== ''}
+                  link={true}
+                  spinnerForNoData={false} />
+              </Box>
+            </Center>
+            : <ExploreMap />
+          }
 
         </GridItem>
       </Grid>
