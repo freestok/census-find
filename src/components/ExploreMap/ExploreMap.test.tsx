@@ -5,7 +5,7 @@ import ExploreMap from './ExploreMap'
 
 describe('<ExploreMap />', () => {
   test('it should mount', () => {
-    render(<ExploreMap />)
+    render(<ExploreMap activeGeom='tract' activeState='AL'/>)
 
     const exploreMap = screen.getByTestId('ExploreMap')
 

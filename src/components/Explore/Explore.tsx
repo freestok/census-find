@@ -246,7 +246,7 @@ const Explore: FC<any> = () => {
                   spinnerForNoData={false} />
               </Box>
             </Center>
-            : <ExploreMap />
+            : <ExploreMap activeGeom={activeGeom} activeState={activeState}/>
           }
 
         </GridItem>

@@ -6,7 +6,6 @@ import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import CensusData from './components/CensusData/CensusData'
 import Explore from './components/Explore/Explore'
-import ExploreMap from './components/ExploreMap/ExploreMap'
 import Navbar from './components/Navbar/Navbar'
 import Query from './components/Query/Query'
 import Templates from './components/Templates/Templates'
@@ -18,7 +17,6 @@ export const App = (): any => (
       <Routes>
         <Route path='/' element={<Explore/>} />
         <Route path='/explore' element={<Explore/>} />
-        <Route path='/explore/map' element={<ExploreMap/>} />
         <Route path='/templates' element={<Templates/>} />
         <Route path='/query' element={<Query/>} />
         <Route path='/data/:type/:geoid' element={<CensusData/>} />
