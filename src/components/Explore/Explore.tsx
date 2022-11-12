@@ -140,7 +140,17 @@ const Explore: FC<any> = () => {
     setUserSearch('')
   }
 
-  const templateSelectOnChange = (event: any): void => setActiveTemplate(event.target.value)
+  const templateSelectOnChange = (event: any): void => {
+    // assign link info
+    const val: string = event.target.value
+    const filtered = [...filteredData]
+    console.log('filtered', filteredData)
+    for (const row of filtered) {
+      row.link = `/data/${activeGeom}/${row.geoid}?template=${val}`
+    }
+    setFilteredData(filtered)
+    setActiveTemplate(Number(val))
+  }
 
   return (
     <div className={styles.Explore} data-testid="Explore">
@@ -246,7 +256,10 @@ const Explore: FC<any> = () => {
                   spinnerForNoData={false} />
               </Box>
             </Center>
-            : <ExploreMap activeGeom={activeGeom} activeState={activeState}/>
+            : <ExploreMap
+                activeGeom={activeGeom}
+                template={activeTemplate}
+                activeState={activeState}/>
           }
 
         </GridItem>

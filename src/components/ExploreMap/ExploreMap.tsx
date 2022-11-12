@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 
-import React, { FC, useEffect, useRef, useState } from 'react'
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
 import styles from './ExploreMap.module.scss'
 // import { GeoJson, Map, Marker } from 'pigeon-maps'
 import Map, { Marker, Source, Layer, FillLayer, MapRef } from 'react-map-gl'
@@ -8,11 +9,19 @@ import axios from 'axios'
 import bbox from '@turf/bbox'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import { Text, Center, Box, useColorModeValue, Stack } from '@chakra-ui/react'
 
 type GeomTypes = 'state' | 'county' | 'place' | 'tract'
+interface GeomNameQuery {
+  name: string
+  geoid: string
+  stusps: string
+  link?: string
+}
 interface ExploreMapProps {
   activeGeom: GeomTypes
   activeState: string
+  template: number
 }
 
 const geomMapper = {
@@ -21,15 +30,14 @@ const geomMapper = {
   tract: 'tracts',
   place: 'places'
 }
-const ExploreMap: FC<ExploreMapProps> = ({ activeGeom, activeState }) => {
+const ExploreMap: FC<ExploreMapProps> = ({ activeGeom, activeState, template }) => {
   const mapRef = useRef<any>()
 
-  const [lat, setLat] = useState(39.18)
-  const [lon, setLon] = useState(-99.21)
+  const [lat] = useState(39.18)
+  const [lon] = useState(-99.21)
   const [geojson, setGeojson] = useState<any>()
-  const [center, setCenter] = useState<any>([-99.21, 39.18])
-  const [zoom, setZoom] = useState(4)
-
+  const [hoverInfo, setHoverInfo] = useState<any>(false)
+  const [cursor, setCursor] = useState('auto')
   const layerStyle: FillLayer = {
     id: 'data',
     type: 'fill',
@@ -46,9 +54,7 @@ const ExploreMap: FC<ExploreMapProps> = ({ activeGeom, activeState }) => {
     }
     const res = await axios.get('/api/geom', { params: queryParams })
     const polygons = JSON.parse(res.data[0])
-    console.log('got polygons')
     setGeojson(polygons)
-    console.log('geojson', geojson)
 
     // set bounds
     let minLng, minLat, maxLng, maxLat
@@ -67,9 +73,25 @@ const ExploreMap: FC<ExploreMapProps> = ({ activeGeom, activeState }) => {
     )
   }
 
+  const onHover = useCallback((event: any) => {
+    const {
+      features,
+      point: { x, y }
+    } = event
+    if (features.length > 0) {
+      setCursor('pointer')
+      setHoverInfo({ feature: features[0], x, y })
+    } else {
+      setHoverInfo(false)
+      setCursor('auto')
+    }
+  }, [])
+
+  const goToDataPage = (): void => {
+    window.location.href = `/data/${activeGeom}/${hoverInfo.feature.properties.geoid}?template=${template}`
+  }
+
   useEffect(() => {
-    console.log('activeGeom', activeGeom)
-    console.log('activeState', activeState)
     getGeojson()
       .then(() => console.log('getGeojson done'))
       .catch((err) => console.error(err))
@@ -79,6 +101,10 @@ const ExploreMap: FC<ExploreMapProps> = ({ activeGeom, activeState }) => {
     <div className={styles.ExploreMap} data-testid="ExploreMap">
       <Map
         ref={mapRef}
+        onMouseMove={onHover}
+        onClick={goToDataPage}
+        cursor={cursor}
+        interactiveLayerIds={['data']}
         initialViewState={{
           longitude: lon,
           latitude: lat,
@@ -93,7 +119,46 @@ const ExploreMap: FC<ExploreMapProps> = ({ activeGeom, activeState }) => {
             <Layer {...layerStyle} />
           </Source>
         }
+        {hoverInfo !== false && (
+          <div style={{
+            left: hoverInfo.x,
+            top: hoverInfo.y,
+            position: 'absolute',
+            margin: '8px',
+            padding: '4px',
+            background: 'rgba(0, 0, 0, 0.8)',
+            color: '#fff',
+            maxWidth: '300px',
+            fontSize: '10px',
+            zIndex: 999,
+            pointerEvents: 'none'
+          }}>
+            <div>{hoverInfo.feature.properties.name}</div>
+          </div>
+        )}
       </Map>
+      <Box
+        bg={useColorModeValue('white', 'gray.900')}
+        width={'25vw'}
+        boxShadow={'xl'}
+        style={{
+          margin: '24px',
+          padding: '12px 24px',
+          position: 'absolute',
+          top: '60px',
+          right: '0',
+          outline: 'none',
+          cursor: 'auto'
+        }}>
+          <Stack>
+            <Text>Click on a {activeGeom} to see its census data.</Text>
+            { hoverInfo !== false &&
+              <Text fontSize='small' fontStyle='italic'>
+                {window.location.protocol}{window.location.hostname}/data/{activeGeom}/{hoverInfo.feature.properties.geoid}?template={template}
+              </Text>
+            }
+          </Stack>
+      </Box>
     </div>
   )
 }
