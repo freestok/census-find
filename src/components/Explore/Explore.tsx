@@ -196,6 +196,7 @@ const Explore: FC<any> = () => {
                 placeholder='Search by name or GEOID'
                 size='md'
                 mb={5}
+                disabled={searchType === 'map'}
               />
               <Stack spacing={8}>
                 <Stack direction={'row'} align={'center'}>

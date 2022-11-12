@@ -31,6 +31,8 @@ const geomMapper = {
   place: 'places'
 }
 const ExploreMap: FC<ExploreMapProps> = ({ activeGeom, activeState, template }) => {
+  // basemaps
+  // https://deck.gl/docs/api-reference/carto/basemap#supported-basemaps
   const mapRef = useRef<any>()
 
   const [lat] = useState(39.18)
@@ -42,7 +44,7 @@ const ExploreMap: FC<ExploreMapProps> = ({ activeGeom, activeState, template }) 
     id: 'data',
     type: 'fill',
     paint: {
-      'fill-color': '#2DA8B7',
+      'fill-color': useColorModeValue('#2DA8B7', '#08ffff'),
       'fill-opacity': 0.6,
       'fill-outline-color': 'black'
     }
@@ -112,7 +114,13 @@ const ExploreMap: FC<ExploreMapProps> = ({ activeGeom, activeState, template }) 
         }}
         mapLib={maplibregl}
         // style={{ width: 800, height: 600 }}
-        mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+        // mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+        mapStyle={
+          useColorModeValue(
+            'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+            'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+          )
+        }
       >
         {geojson !== undefined &&
           <Source id="my-data" type="geojson" data={geojson}>
