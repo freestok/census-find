@@ -43,26 +43,36 @@ interface VariableListProps {
   setActiveDataset: React.Dispatch<any>
   setActiveYear: React.Dispatch<any>
   setHighLevelList: React.Dispatch<any>
+  title: string
 }
 
-const VariableTable: FC<any> = ({ data, setHighLevelList }) => {
-  const [maxRecords, setMaxRecords] = useState<number>(100)
+interface VariableTableInterface {
+  data: any
+  setHighLevelList: React.Dispatch<any>
+  resultStyle: ResultStyle
+  resultNumber: number
+}
+const VariableTable: FC<VariableTableInterface> = ({ data, setHighLevelList, resultStyle, resultNumber }) => {
+  const [maxRecords, setMaxRecords] = useState<number>(resultNumber)
 
   const handleButtonClick = (record: any): void => {
     record.disabled = true
     setHighLevelList((prevState: any) => [...prevState, record])
   }
 
-  const handleLoadMore = (): void => setMaxRecords(maxRecords + 100)
+  const handleLoadMore = (): void => setMaxRecords(maxRecords + resultNumber)
   return (
     <Stack align='start'>
       {data.slice(0, maxRecords).map((e: any) => (
         <Button key={e.name} size='sm' overflow='hidden' textOverflow={'ellipsis'} colorScheme='blue' textAlign={'left'}
           value={e.concept} onClick={() => handleButtonClick(e)} disabled={e.disabled}>
-          {e.concept}
+          {resultStyle === 'all'
+            ? e.concept
+            : `${e.concept} - ${e.label}`
+          }
         </Button>
       ))}
-      {maxRecords < data.length &&
+      {(maxRecords < data.length && resultStyle === 'all') &&
         <Button onClick={handleLoadMore}>
           Load More
         </Button>
@@ -74,7 +84,7 @@ const VariableTable: FC<any> = ({ data, setHighLevelList }) => {
 const VariableList: FC<VariableListProps> = ({
   shallow, resultStyle, resultNumber, filteredData,
   setActiveDataset, setActiveYear, setHighLevelList,
-  setFilteredData
+  setFilteredData, title
 }) => {
   const [years, setYears] = useState<any>()
   const [varList, setVarList] = useState<any>()
@@ -142,7 +152,7 @@ const VariableList: FC<VariableListProps> = ({
         p={6}
         textAlign={'center'}
       >
-        <Heading size='lg' mb={5}>Template Builder</Heading>
+        <Heading size='lg' mb={5}>{title}</Heading>
         <Stack spacing={8}>
 
           {config !== undefined &&
@@ -173,7 +183,9 @@ const VariableList: FC<VariableListProps> = ({
                 mb={5}
               />
               <Box maxHeight='70vh' overflow='auto' overflowX='scroll' maxWidth='100rem'>
-                <VariableTable data={filteredData} setHighLevelList={setHighLevelList} />
+                <VariableTable data={filteredData} setHighLevelList={setHighLevelList}
+                  resultNumber={resultNumber}
+                  resultStyle={resultStyle}/>
               </Box>
             </>
           }

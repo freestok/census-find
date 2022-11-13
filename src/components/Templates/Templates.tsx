@@ -86,7 +86,8 @@ const Templates: FC<any> = () => {
             filteredData={filteredData}
             shallow={true}
             resultNumber={100}
-            resultStyle='all' />
+            resultStyle='all'
+            title='Template Builder' />
         </GridItem>
         {/* high level preview */}
         <GridItem rowSpan={2} colSpan={3} py={6} mr={2}>
