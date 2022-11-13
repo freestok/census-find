@@ -9,7 +9,6 @@ import Explore from './components/Explore/Explore'
 import Navbar from './components/Navbar/Navbar'
 import Query from './components/Query/Query'
 import Templates from './components/Templates/Templates'
-import 'mapbox-gl/dist/mapbox-gl.css'
 
 export const App = (): any => (
   <ChakraProvider theme={theme}>

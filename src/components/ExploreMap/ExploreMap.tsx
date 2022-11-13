@@ -8,16 +8,10 @@ import Map, { Marker, Source, Layer, FillLayer, MapRef } from 'react-map-gl'
 import axios from 'axios'
 import bbox from '@turf/bbox'
 import maplibregl from 'maplibre-gl'
-import 'maplibre-gl/dist/maplibre-gl.css'
 import { Text, Center, Box, useColorModeValue, Stack } from '@chakra-ui/react'
+import 'maplibre-gl/dist/maplibre-gl.css'
 
 type GeomTypes = 'state' | 'county' | 'place' | 'tract'
-interface GeomNameQuery {
-  name: string
-  geoid: string
-  stusps: string
-  link?: string
-}
 interface ExploreMapProps {
   activeGeom: GeomTypes
   activeState: string
@@ -113,8 +107,6 @@ const ExploreMap: FC<ExploreMapProps> = ({ activeGeom, activeState, template }) 
           zoom: 4
         }}
         mapLib={maplibregl}
-        // style={{ width: 800, height: 600 }}
-        // mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
         mapStyle={
           useColorModeValue(
             'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
