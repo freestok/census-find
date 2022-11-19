@@ -29,7 +29,8 @@ import {
   Tr,
   IconButton,
   Icon,
-  ButtonGroup
+  ButtonGroup,
+  Collapse
 } from '@chakra-ui/react'
 import axios from 'axios'
 
@@ -39,11 +40,14 @@ interface VariableListProps {
   resultStyle: ResultStyle
   resultNumber: number
   filteredData: any
+  title: string
   setFilteredData: React.Dispatch<any>
   setActiveDataset: React.Dispatch<any>
   setActiveYear: React.Dispatch<any>
   setHighLevelList: React.Dispatch<any>
-  title: string
+  setActiveGeom?: React.Dispatch<any>
+  activeGeom?: string
+  setActiveState?: React.Dispatch<any>
 }
 
 interface VariableTableInterface {
@@ -52,6 +56,18 @@ interface VariableTableInterface {
   resultStyle: ResultStyle
   resultNumber: number
 }
+
+const DropdownLabel: FC<any> = ({ text }) => (
+  <Flex
+    w={20}
+    h={8}
+    align={'center'}
+    justify={'center'}
+    rounded={'full'}>
+    <Text>{text}</Text>
+  </Flex>
+)
+
 const VariableTable: FC<VariableTableInterface> = ({ data, setHighLevelList, resultStyle, resultNumber }) => {
   const [maxRecords, setMaxRecords] = useState<number>(resultNumber)
 
@@ -84,12 +100,18 @@ const VariableTable: FC<VariableTableInterface> = ({ data, setHighLevelList, res
 const VariableList: FC<VariableListProps> = ({
   shallow, resultStyle, resultNumber, filteredData,
   setActiveDataset, setActiveYear, setHighLevelList,
-  setFilteredData, title
+  setFilteredData, title, setActiveGeom, setActiveState: setState, activeGeom
 }) => {
   const [years, setYears] = useState<any>()
   const [varList, setVarList] = useState<any>()
   const [config, setConfig] = useState<any>()
   // const [filteredData, setFilteredData] = useState<any[]>([])
+
+  const stateNames = ['AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI',
+    'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN',
+    'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH',
+    'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA',
+    'WV', 'WI', 'WY']
 
   const setVariablesFromConfig = async (): Promise<void> => {
     console.log('get variables')
@@ -156,39 +178,68 @@ const VariableList: FC<VariableListProps> = ({
         <Stack spacing={8}>
 
           {config !== undefined &&
-            <Select placeholder='Select a dataset' onChange={datasetOnChange}>
-              {/* {activeDataset === undefined && <option value=''> </option>} */}
-              {config.datasets.map((e: any, index: number) => (
-                <option key={e.name} value={index}>{e.alias}</option>
-              ))}
-            </Select>
+            <Stack direction={'row'} align={'center'}>
+              <DropdownLabel text='Dataset:' />
+              <Select placeholder='Select a dataset' onChange={datasetOnChange}>
+                {/* {activeDataset === undefined && <option value=''> </option>} */}
+                {config.datasets.map((e: any, index: number) => (
+                  <option key={e.name} value={index}>{e.alias}</option>
+                ))}
+              </Select>
+            </Stack>
           }
           {years !== undefined &&
-            <Select placeholder='Select a year' onChange={yearOnChange}>
-              {/* {activeYear === undefined && <option value=''> </option>} */}
-              {years.map((e: any) => (
-                <option key={e} value={e}>{e}</option>
-              ))}
-            </Select>
+            <Collapse in={years !== undefined} animateOpacity>
+              <Stack direction={'row'} align={'center'}>
+                <DropdownLabel text='Year:' />
+                <Select placeholder='Select a year' onChange={yearOnChange}>
+                  {/* {activeYear === undefined && <option value=''> </option>} */}
+                  {years.map((e: any) => (
+                    <option key={e} value={e}>{e}</option>
+                  ))}
+                </Select>
+              </Stack>
+            </Collapse>
           }
-          {varList !== undefined &&
+          { (setActiveGeom !== undefined && setState !== undefined) &&
             <>
-              <Heading size='md'>Click a button to add to your template</Heading>
-              <Input
-                // value={userSearch}
-                onChange={handleSearchChange}
-                variant='filled'
-                placeholder='Filter by searching for a variable'
-                size='md'
-                mb={5}
-              />
-              <Box maxHeight='70vh' overflow='auto' overflowX='scroll' maxWidth='100rem'>
-                <VariableTable data={filteredData} setHighLevelList={setHighLevelList}
-                  resultNumber={resultNumber}
-                  resultStyle={resultStyle}/>
-              </Box>
+              <Stack direction={'row'} align={'center'}>
+                <DropdownLabel text='Geography Type:' />
+                <Select onChange={(e: any): void => setActiveGeom(e.target.value)}>
+                  <option value='state' defaultValue='state'>State</option>
+                  <option value='county'>County</option>
+                  <option value='tract'>Tracts</option>
+                  <option value='place'>Places</option>
+                </Select>
+              </Stack>
+              <Stack direction={'row'} align={'center'}
+                hidden={activeGeom === 'state'}>
+                <DropdownLabel text='State:' />
+                <Select onChange={(e: any): void => setState(e.target.value)}>
+                  <option key={'AL'} value={'AL'}>AL</option>
+                  {stateNames.map(e => (
+                    <option key={e} value={e}>{e}</option>
+                  ))}
+                </Select>
+              </Stack>
             </>
           }
+          <Collapse in={varList !== undefined} animateOpacity>
+            <Heading size='md' mb={3}>Click a button to add to your {resultStyle === 'all' ? 'template' : 'query'}</Heading>
+            <Input
+              // value={userSearch}
+              onChange={handleSearchChange}
+              variant='filled'
+              placeholder='Filter by searching for a variable'
+              size='md'
+              mb={5}
+            />
+            <Box maxHeight='70vh' overflow='auto' overflowX='scroll' maxWidth='100rem'>
+              <VariableTable data={filteredData} setHighLevelList={setHighLevelList}
+                resultNumber={resultNumber}
+                resultStyle={resultStyle}/>
+            </Box>
+          </Collapse>
         </Stack>
 
       </Box>

@@ -23,28 +23,8 @@ import DataTable from '../DataTable/DataTable'
 import { Map, Marker } from 'pigeon-maps'
 import { FaGlobeAmericas, FaTable } from 'react-icons/fa'
 import ExploreMap from '../ExploreMap/ExploreMap'
-
+import { GeomNameQuery, CensusGeoms, Templates, GeomTypes } from '../interfaces'
 // interface ExploreProps {}
-
-interface GeomNameQuery {
-  name: string
-  geoid: string
-  stusps: string
-  link?: string
-}
-
-interface CensusGeoms {
-  state: GeomNameQuery[]
-  county: GeomNameQuery[]
-  place: GeomNameQuery[]
-  tract: GeomNameQuery[]
-}
-
-interface Templates {
-  id: number
-  title: string
-}
-type GeomTypes = 'state' | 'county' | 'place' | 'tract'
 
 const DropdownLabel: FC<any> = ({ text }) => (
   <Flex
