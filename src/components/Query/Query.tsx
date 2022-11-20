@@ -52,17 +52,17 @@ const Query: FC<any> = () => {
   const [activeState, setActiveState] = useState<any>('AL')
   const [filteredData, setFilteredData] = useState<any[]>([])
   const [highLevelList, setHighLevelList] = useState<any[]>([])
-  const [incrementValue, setIncrementValue] = React.useState('0')
-  const [numberType, setNumberType] = useState<NumberType>('percent')
+  const [incrementValues, setIncrementValues] = useState<string[]>([])
+  const [numberTypes, setNumberTypes] = useState<NumberType[]>([])
   const [queryType, setQueryType] = useState<QueryType>('all')
+  const [queryLoading, setQueryLoading] = useState(false)
+  const [operators, setOperators] = useState<string[]>([])
 
   const removeHighLevelList = (record: any, index: number): void => {
     // loop over the todos list and find the provided id.
     const updatedList = filteredData.map((item: any) => {
-      if (item.name === record.name) {
-        return { ...item, disabled: false } // gets everything that was already in item, and updates "done"
-      }
-      return item // else return unmodified item
+      if (item.name === record.name) return { ...item, disabled: false }
+      else return item // else return unmodified item
     })
 
     setFilteredData(updatedList) // set state to new object with updated list
@@ -70,14 +70,72 @@ const Query: FC<any> = () => {
       ...highLevelList.slice(0, index),
       ...highLevelList.slice(index + 1)
     ])
+    setNumberTypes([
+      ...numberTypes.slice(0, index),
+      ...numberTypes.slice(index + 1)
+    ])
+    setOperators([
+      ...operators.slice(0, index),
+      ...operators.slice(index + 1)
+    ])
   }
 
   const format = (val: string): string => `${val}%`
   const parse = (val: string): string => val.replace(/^\$/, '')
 
-  const handleNumberTypeChange = (event: any): void => {
-    setNumberType(event.target.value)
-    setIncrementValue('0')
+  const handleNumberTypeChange = (event: any, index: number): void => {
+    // setNumberType(event.target.value)
+    const newItems = [...numberTypes]
+    newItems[index] = event.target.value
+    setNumberTypes(newItems)
+    // return {items: newItems};
+    // record.numberType = event.target.value
+    // setHighLevelList((prevState: any) => [...prevState, record])
+    const newIncrements = [...incrementValues]
+    newIncrements[index] = '0'
+    setIncrementValues(newIncrements)
+  }
+
+  const handleQueryClick = (): void => {
+    runQuery()
+      .then(() => console.log('runQuery complete'))
+      .catch((err) => console.error(err))
+  }
+
+  const runQuery = async (): Promise<void> => {
+    setQueryLoading(true)
+
+    const variables = highLevelList.map(e => e.name)
+    const queries = highLevelList.map((e: any, index: number) => (
+      {
+        variable: e.name,
+        numberType: numberTypes[index],
+        value: incrementValues[index],
+        operator: operators[index]
+      }
+    ))
+    const params = {
+      dataset: activeDataset.name[0],
+      activeYear,
+      activeGeom,
+      activeState,
+      queryType,
+      variables,
+      queries
+    }
+    console.log('params', params)
+  }
+
+  const handleNumberInputChange = (event: any, index: number): void => {
+    const newIncrements = [...incrementValues]
+    newIncrements[index] = event
+    setIncrementValues(newIncrements)
+  }
+
+  const handleOperatorChange = (event: any, index: number): void => {
+    const newOperators = [...operators]
+    newOperators[index] = event.target.value
+    setOperators(newOperators)
   }
   return (
     <div className={styles.Query} data-testid="Query">
@@ -116,12 +174,12 @@ const Query: FC<any> = () => {
               <Heading size='lg' mb={5}>Query Overview</Heading>
               <Text>Enter a name for your template and click finish once complete.</Text>
               <Stack direction={'row'} >
-                  <Select maxW='15vw' onChange={(e: any): void => setQueryType(e.target.value)}>
+                  <Select maxW='25vw' onChange={(e: any): void => setQueryType(e.target.value)}>
                       <option value={'all'}>All of these are true</option>
                       <option value={'any'}>Any of these are true</option>
                     </Select>
                   <Button colorScheme='green' width='7em' mb={3}
-                    // onClick={handleFinish}
+                    onClick={handleQueryClick}
                     disabled={(highLevelList.length < 1 || activeYear === undefined) && true}>
                       Run Query
                   </Button>
@@ -142,21 +200,22 @@ const Query: FC<any> = () => {
                         {e.concept} - {e.label}
                       </Button>
                     </Tooltip>
-                    <Select maxW='15vw' onChange={handleNumberTypeChange}>
+                    <Select maxW='15vw' placeholder='% or Value' onChange={(event) => handleNumberTypeChange(event, index)}>
                       <option value={'percent'}>Percentage</option>
                       <option value={'value'}>Value</option>
                     </Select>
-                    <Select placeholder='Select an operator' maxW='15vw'>
+                    <Select placeholder='Select an operator' maxW='15vw'
+                      onChange={(value: any): void => handleOperatorChange(value, index)}>
                       <option value={'equal'}>equal to</option>
                       <option value={'greater'}>greater than</option>
                       <option value={'less'}>less than</option>
                       <option value={'greaterThanEqual'}>greater than or equal to</option>
                       <option value={'lessThanEqual'}>less than or equal to</option>
                     </Select>
-                    {numberType === 'percent'
+                    {numberTypes[index] === 'percent'
                       ? <NumberInput
-                        onChange={(valueString) => setIncrementValue(parse(valueString))}
-                        value={format(incrementValue)}
+                        onChange={(valueString) => handleNumberInputChange(parse(valueString), index)}
+                        value={format(incrementValues[index])}
                         min={0}
                         max={100}>
                         <NumberInputField />
@@ -166,7 +225,8 @@ const Query: FC<any> = () => {
                         </NumberInputStepper>
                       </NumberInput>
                       : <NumberInput
-                        onChange={(valueString) => setIncrementValue(parse(valueString))}
+                        onChange={(valueString) => handleNumberInputChange(parse(valueString), index)}
+                        value={incrementValues[index]}
                         min={0}>
                         <NumberInputField />
                         <NumberInputStepper>
