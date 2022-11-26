@@ -14,6 +14,7 @@ source(here('modules', 'data.R'))
 source(here('modules', 'geom.R'))
 source(here('modules', 'variables.R'))
 source(here('modules', 'templates.R'))
+source(here('modules', 'query.R'))
 
 print(pr)
 # con <- get_con()
@@ -74,6 +75,18 @@ function(req) {
   data_acs_post(req)
 }
 
+#* retrieve ACS data
+#* @post /api/query/acs
+function(req) {
+  query_acs_post(req)
+}
+
+#* retrieve ACS data
+#* @post /api/query/dec
+function(req) {
+  query_dec_post(req)
+}
+
 #* retrieve decennial data
 #* @post /api/data/dec
 function(req) {
@@ -110,4 +123,15 @@ function(req) {
 #* @get /api/config
 function() {
   config
+}
+
+#* Return the config
+#* @post /api/test
+function(req) {
+  queries <- req$body$queries
+  print(queries)
+  for (i in queries) {
+    print(i)
+  }
+  queries
 }

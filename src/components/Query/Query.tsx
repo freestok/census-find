@@ -47,7 +47,7 @@ import { QueryType, GeomTypes, NumberType } from '../interfaces'
 
 const Query: FC<any> = () => {
   const [activeDataset, setActiveDataset] = useState<any>()
-  const [activeYear, setActiveYear] = useState<any>()
+  const [activeYear, setActiveYear] = useState<string>()
   const [activeGeom, setActiveGeom] = useState<GeomTypes>('state')
   const [activeState, setActiveState] = useState<any>('AL')
   const [filteredData, setFilteredData] = useState<any[]>([])
@@ -115,10 +115,10 @@ const Query: FC<any> = () => {
       }
     ))
     const params = {
-      dataset: activeDataset.name[0],
-      activeYear,
-      activeGeom,
-      activeState,
+      survey: activeDataset.name[0],
+      year: Number(activeYear),
+      geography: activeGeom,
+      state: activeState,
       queryType,
       variables,
       queries
