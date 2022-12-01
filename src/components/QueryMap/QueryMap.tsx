@@ -6,6 +6,7 @@ import Map, { Marker, Source, Layer, FillLayer, MapRef } from 'react-map-gl'
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
 import styles from './QueryMap.module.scss'
 import maplibregl from 'maplibre-gl'
+import bbox from '@turf/bbox'
 
 interface QueryMapProps {
   geojson: any
@@ -13,15 +14,6 @@ interface QueryMapProps {
 
 interface PopupInterface {
   feature: any
-}
-
-const chunkArray = (array: any[], size: number): any[] => {
-  const result = []
-  for (let i = 0; i < array.length; i += size) {
-    const chunk = array.slice(i, i + size)
-    result.push(chunk)
-  }
-  return result
 }
 
 const PopupInfo: FC<PopupInterface> = ({ feature }) => (
@@ -104,6 +96,20 @@ const QueryMap: FC<QueryMapProps> = ({ geojson }) => {
     }
   }, [])
 
+  const onMapLoad = (event: any): void => {
+    // let minLng, minLat, maxLng, maxLat
+    const [minLng, minLat, maxLng, maxLat] = bbox(geojson)
+
+    console.log('mapRef.current', mapRef.current)
+    mapRef.current?.fitBounds(
+      [
+        [minLng, minLat],
+        [maxLng, maxLat]
+      ],
+      { padding: 40, duration: 1000 }
+    )
+  }
+
   return (
     <div className={styles.QueryMap} data-testid="QueryMap">
         <Map
@@ -123,6 +129,7 @@ const QueryMap: FC<QueryMapProps> = ({ geojson }) => {
               'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
             )
           }
+          onLoad={onMapLoad}
         >
           {geojson !== undefined &&
             <Source id="my-data" type="geojson" data={geojson}>

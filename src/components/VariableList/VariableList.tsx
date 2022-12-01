@@ -188,20 +188,7 @@ const VariableList: FC<VariableListProps> = ({
               </Select>
             </Stack>
           }
-          {years !== undefined &&
-            <Collapse in={years !== undefined} animateOpacity>
-              <Stack direction={'row'} align={'center'}>
-                <DropdownLabel text='Year:' />
-                <Select placeholder='Select a year' onChange={yearOnChange}>
-                  {/* {activeYear === undefined && <option value=''> </option>} */}
-                  {years.map((e: any) => (
-                    <option key={e} value={e}>{e}</option>
-                  ))}
-                </Select>
-              </Stack>
-            </Collapse>
-          }
-          { (setActiveGeom !== undefined && setState !== undefined) &&
+          {(setActiveGeom !== undefined && setState !== undefined) &&
             <>
               <Stack direction={'row'} align={'center'}>
                 <DropdownLabel text='Geography Type:' />
@@ -223,6 +210,19 @@ const VariableList: FC<VariableListProps> = ({
                 </Select>
               </Stack>
             </>
+          }
+          {years !== undefined &&
+            <Collapse in={years !== undefined} animateOpacity>
+              <Stack direction={'row'} align={'center'}>
+                <DropdownLabel text='Year:' />
+                <Select placeholder='Select a year' onChange={yearOnChange}>
+                  {/* {activeYear === undefined && <option value=''> </option>} */}
+                  {years.map((e: any) => (
+                    <option key={e} value={e}>{e}</option>
+                  ))}
+                </Select>
+              </Stack>
+            </Collapse>
           }
           <Collapse in={varList !== undefined} animateOpacity>
             <Heading size='md' mb={3}>Click a button to add to your {resultStyle === 'all' ? 'template' : 'query'}</Heading>
