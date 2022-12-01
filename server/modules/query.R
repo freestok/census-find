@@ -18,7 +18,7 @@ query_acs_post <- function(req) {
         operator == 'lessThanEqual' ~ '<='
       ),
       query_column = if_else(numberType == 'percent', 'percent', 'estimate'),
-      expression = glue('{numberType}_{variable} {operator_symbol} {value}')
+      expression = glue('{query_column}_{variable} {operator_symbol} {value}')
     )
   
   if (body$queryType == 'all') {
@@ -27,6 +27,9 @@ query_acs_post <- function(req) {
     selection_statement = paste(expressions$expression, collapse = ' | ')
   }
 
+  print('selection statement ----------------')
+  print(selection_statement)
+  print('selection statement ----------------')
   # get data and prep the data
   data <- get_acs(
     geography = body$geography,
@@ -41,11 +44,25 @@ query_acs_post <- function(req) {
     group_by(GEOID, var_group) |>
     mutate(group_max = max(estimate)) |>
     ungroup() |>
-    mutate(percent = 100 * (estimate / group_max),
-           moe_perc = 100 * (moe / estimate)) |>
-    select(-NAME, -group_max, -var_group) |>
+    mutate(
+      percent = 100 * (estimate / group_max),
+      moe_perc = 100 * (moe / estimate),
+      # label = str_c(
+      #   format(estimate, nsmall = 0, big.mark = ","),
+      #   glue('({percent}%)'),
+      #   if_else(
+      #     is.null(moe),
+      #     "",
+      #     glue('±{format(moe, nsmall=0, big.mark=",")}')
+      #   ),
+      #   sep = ' '
+      # )
+      label = glue('{estimate};{percent};{moe}')
+    ) |>
+    #  label = glue('{format(estimate, nsmall=0, big.mark=",")} ({percent}%) {if_else(is.NULL(moe), "", )}±{format(moe, nsmall=0, big.mark=",")}')) |>
+    select(-NAME,-group_max,-var_group) |> 
     # pivot wider makes it easier for querying
-    pivot_wider(values_from = c(estimate, percent, moe, moe_perc), names_from=variable) |>
+    pivot_wider(values_from = c(estimate, percent, moe, moe_perc, label), names_from=variable) |>
     # smoosh the rows together by GEOID
     group_by(GEOID) |>
     fill(everything(), .direction = "downup") |>
@@ -67,7 +84,7 @@ query_acs_post <- function(req) {
   columns = colnames(data)
   print(columns)
   for (column in columns) {
-    stripped <- str_replace(column, 'estimate_|percent_|moe_perc_|moe_', '')
+    stripped <- str_replace(column, 'estimate_|percent_|moe_perc_|moe_|label_', '')
     idx <- which(columns == column)
     match <- filter(query_res, name == stripped)
     if (str_starts(column, 'percent')) {
@@ -78,15 +95,22 @@ query_acs_post <- function(req) {
       colnames(data)[idx] = glue('{match$full_label} (MoE)')
     } else if (str_starts(column, 'moe_')) {
       colnames(data)[idx] = glue('{match$full_label} (MoE %)')
+    } else if (str_starts(column ,'label')) {
+      colnames(data)[idx] = glue('{match$full_label} (label)')
     }
   }
 
   geoids <- paste(data$geoid, collapse="','")
-  get_geoids_statement = glue("select * from states where geoid IN ('{geoids}')")
+  get_geoids_statement = glue("select * from {body$geographyName} where geoid IN ('{geoids}')")
   print(get_geoids_statement)
+  # st <- sf::st_read(con, query = get_geoids_statement)
+  # return (st)
+  # print(st)
+
   sf::st_read(con, query = get_geoids_statement) |>
     left_join(data, by = 'geoid') |>
-    select(-geoid, -stusps) |>
+    # select(-geoid, -stusps) |>
+    select(name, contains('label')) |>
     geojsonsf::sf_geojson(digits=5)
 }
 
