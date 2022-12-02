@@ -89,7 +89,6 @@ const QueryMap: FC<QueryMapProps> = ({ geojson }) => {
       }
       setCursor('pointer')
       setHoverInfo({ feature, x, y, info })
-      console.log('hoverInfo', info)
     } else {
       setHoverInfo(false)
       setCursor('auto')

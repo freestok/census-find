@@ -111,8 +111,33 @@ const Query: FC<any> = () => {
 
   const runQuery = async (): Promise<void> => {
     setQueryLoading(true)
+    const survey = activeDataset.name[0]
+
+    let concepts
+    if (survey === 'acs5') {
+      const allConcepts = highLevelList.map(e => e.name.split('_')[0])
+      concepts = [...new Set(allConcepts)]
+    } else {
+      const allConcepts = highLevelList.map(e => e.name.slice(0, e.name.length - 3))
+      concepts = [...new Set(allConcepts)]
+    }
 
     const variables = highLevelList.map(e => e.name)
+
+    for (const concept of concepts) {
+      if (survey === 'acs5') {
+        const varParent = `${concept}_001`
+        if (!variables.includes(varParent)) {
+          variables.push(varParent)
+        }
+      } else {
+        const varParent = `${concept}001`
+        if (!variables.includes(varParent)) {
+          variables.push(varParent)
+        }
+      }
+    }
+
     const queries = highLevelList.map((e: any, index: number) => (
       {
         variable: e.name,
@@ -121,7 +146,6 @@ const Query: FC<any> = () => {
         operator: operators[index]
       }
     ))
-    const survey = activeDataset.name[0]
     const params = {
       survey,
       year: Number(activeYear),

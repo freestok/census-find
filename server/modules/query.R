@@ -36,7 +36,7 @@ query_acs_post <- function(req) {
     survey    = body$survey,
     variables = body$variables,
     state     = state,
-    year      = 2020,
+    year      = body$year,
     cache     = TRUE
   ) |>
     # filter(GEOID == body$geoid) |>
@@ -95,21 +95,98 @@ query_acs_post <- function(req) {
     geojsonsf::sf_geojson(digits=5)
 }
 
-# test_req = list(
-#   body = list(
-#     geography = 'acs5',
-#     year = '2020',
-#     geography = 'state',
-#     queryType = 'all',
-#     state = 'AL',
-#     variables = c("B01001_009", "B01001_006"),
-#     queries = c(
-#       list(variable = "B01001_009", numberType = "percent", value = "4", operator = "greater"),
-#       list(variable = "B01001_006", numberType = "percent", value = "5", operator = "greater")
-#     )
-#   )
-# )
 query_dec_post <- function(req) {
+  body <- req$body
+
+  if (body$geography == 'state') {
+    state = NULL
+  } else {
+    state = body$state
+  }
+  
+  # prep the filter statement from query results
+  expressions <- body$queries |>
+    mutate(
+      operator_symbol = case_when(
+        operator == 'equal' ~ '==',
+        operator == 'greater' ~ '>',
+        operator == 'less' ~ '<',
+        operator == 'greaterThanEqual' ~ '>=',
+        operator == 'lessThanEqual' ~ '<='
+      ),
+      query_column = if_else(numberType == 'percent', 'percent', 'value'),
+      expression = glue('{query_column}_{variable} {operator_symbol} {value}')
+    )
+  
+  if (body$queryType == 'all') {
+    selection_statement = paste(expressions$expression, collapse = ' & ')
+  } else { # any
+    selection_statement = paste(expressions$expression, collapse = ' | ')
+  }
+
+  print('selection statement ----------------')
+  print(selection_statement)
+  print('selection statement ----------------')
+  # get data and prep the data
+  # now get the data
+  print('******************')
+  print(body$geography)
+  print(body$survey)
+  print(body$variables)
+  print(body$state)
+  print(body$year)
+  print('******************')
+  data <- get_decennial(
+    geography = body$geography,
+    survey    = body$survey,
+    variables = body$variables,
+    state     = state,
+    year      = body$year,
+    cache     = TRUE
+  ) |> # perform some operations
+    mutate(var_group = str_replace(variable, '(\\d{3})$', '')) |>
+    group_by(GEOID, var_group) |>
+    mutate(group_max = max(value)) |>
+    ungroup() |>
+    mutate(
+      percent = 100 * (value / group_max),
+      label = glue('{value};{round(percent, 2)}')
+    ) |>
+    select(-NAME, -group_max, -var_group) |>
+    # pivot wider makes it easier for querying
+    pivot_wider(values_from = c(value, percent, label), names_from=variable) |>
+    # smoosh the rows together by GEOID
+    group_by(GEOID) |>
+    fill(everything(), .direction = "downup") |>
+    slice(1) |>
+    # now do the final query to filter the data we want
+    filter(rlang::eval_tidy(rlang::parse_expr(selection_statement))) |>
+    rename(geoid = GEOID)
+
+  print(head(data))
+
+  variables <- paste(body$variables, collapse = "','")
+  query_res <- dbGetQuery(con, glue("SELECT * FROM sf1_2010_vars WHERE name IN ('{variables}')")) |>
+    mutate(full_label = glue('{concept} - {label}'))
+  columns = colnames(data)
+  print(columns)
+  for (column in columns) {
+    stripped <- str_replace(column, 'label_', '')
+    idx <- which(columns == column)
+    match <- filter(query_res, name == stripped)
+    if (str_starts(column ,'label')) {
+      colnames(data)[idx] = glue('{match$full_label} (label)')
+    }
+  }
+
+  geoids <- paste(data$geoid, collapse="','")
+  get_geoids_statement = glue("select * from {body$geographyName} where geoid IN ('{geoids}')")
+
+  sf::st_read(con, query = get_geoids_statement) |>
+    left_join(data, by = 'geoid') |>
+    # select(-geoid, -stusps) |>
+    select(name, contains('label')) |>
+    geojsonsf::sf_geojson(digits=5)
 }
 
 # example calls
