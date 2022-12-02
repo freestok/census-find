@@ -12,7 +12,8 @@ import {
   Heading,
   useColorModeValue,
   Input,
-  Button
+  Button,
+  useToast
 } from '@chakra-ui/react'
 import { FaRegTimesCircle } from 'react-icons/fa'
 import styles from './Templates.module.scss'
@@ -26,6 +27,8 @@ const Templates: FC<any> = () => {
   const [filteredData, setFilteredData] = useState<any[]>([])
   const [highLevelList, setHighLevelList] = useState<any[]>([])
   const [templateName, setTemplateName] = useState<string>('')
+
+  const toast = useToast()
 
   const handleTemplateName = (event: any): void => setTemplateName(event.target.value)
 
@@ -46,7 +49,11 @@ const Templates: FC<any> = () => {
   }
 
   const handleFinish = (): void => {
-    const vars = highLevelList.map(e => `${e.name.split('_')[0]}_`)
+    // if it's dec, then grab everything but the last 3 characters
+    const vars = (activeDataset.name[0] === 'acs5')
+      ? highLevelList.map(e => `${e.name.split('_')[0]}_`)
+      : highLevelList.map(e => e.name.slice(0, e.name.length - 3))
+
     const payload = {
       year: activeYear,
       variables: vars,
@@ -57,7 +64,19 @@ const Templates: FC<any> = () => {
     // const result = await axios.post('/api/templates', payload)
     console.log('payload', payload)
     postTemplate(payload)
-      .then(() => console.log('postTemplate complete'))
+      .then(() => {
+        toast({
+          title: 'Successfully submitted template',
+          status: 'success',
+          isClosable: true,
+          position: 'top-right'
+        })
+        // setHighLevelList([])
+        setTemplateName('')
+        // setFilteredData([])
+        // setActiveYear(undefined)
+        // setActiveDataset(undefined)
+      })
       .catch(e => console.error(e))
   }
 
@@ -102,7 +121,7 @@ const Templates: FC<any> = () => {
                 <Heading size='lg' mb={5}>Template Overview</Heading>
                 <Text>Enter a name for your template and click finish once complete.</Text>
                 <Stack direction={'row'}>
-                  <Input placeholder='Template Name' onChange={handleTemplateName}/>
+                  <Input placeholder='Template Name' onChange={handleTemplateName} value={templateName}/>
                   {/* <Center> */}
                     <Button colorScheme='green' width='5em' mb={3}
                       onClick={handleFinish}

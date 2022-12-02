@@ -14,7 +14,8 @@ import {
   Select,
   Flex,
   IconButton,
-  Spacer
+  Spacer,
+  useToast
 } from '@chakra-ui/react'
 import React, { FC, useEffect, useState } from 'react'
 import styles from './Explore.module.scss'
@@ -45,6 +46,9 @@ const Explore: FC<any> = () => {
   const [userSearch, setUserSearch] = useState('')
   const [templates, setTemplates] = useState<Templates[]>()
   const [searchType, setSearchType] = useState('table')
+  const [templatesExist, setTemplatesExist] = useState(true)
+
+  const toast = useToast()
 
   const stateNames = ['AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI',
     'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN',
@@ -73,8 +77,22 @@ const Explore: FC<any> = () => {
     const res = await axios.get('/api/templates/all')
     const data: Templates[] = res.data
     setTemplates(data)
-    setActiveTemplate(data[0].id)
-    console.log('res.data.id', data[0].id)
+    if (data[0] !== undefined) {
+      setActiveTemplate(data[0].id)
+      console.log('res.data.id', data[0].id)
+    } else {
+      setTemplatesExist(false)
+      if (!toast.isActive('template-alert')) {
+        toast({
+          id: 'template-alert',
+          title: 'No templates exist. Please create one on the Templates page.',
+          status: 'error',
+          isClosable: true,
+          duration: 1000 * 60,
+          position: 'top-right'
+        })
+      }
+    }
   }
 
   useEffect(() => {
@@ -160,7 +178,8 @@ const Explore: FC<any> = () => {
                   onClick={() => setSearchType('table')}/>
                 <IconButton aria-label='Search database' icon={<FaGlobeAmericas />}
                   colorScheme={searchType === 'map' ? 'blue' : 'gray'}
-                  onClick={() => setSearchType('map')}/>
+                  onClick={() => setSearchType('map')}
+                  disabled={!templatesExist}/>
               </Stack>
               <Heading fontSize={'2xl'} fontFamily={'body'} mb={4}>
                 Search for a Place
@@ -176,7 +195,7 @@ const Explore: FC<any> = () => {
                 placeholder='Search by name or GEOID'
                 size='md'
                 mb={5}
-                disabled={searchType === 'map'}
+                disabled={searchType === 'map' || !templatesExist}
               />
               <Stack spacing={8}>
                 <Stack direction={'row'} align={'center'}>

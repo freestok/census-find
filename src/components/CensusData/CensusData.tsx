@@ -13,9 +13,12 @@ interface TemplateInfo {
   var: string
   year: number
 }
+type SurveyType = 'acs5' | 'sf1'
+
 const CensusData: FC<any> = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [censusData, setCensusData] = useState([])
+  const [survey, setSurvey] = useState<SurveyType>()
   const params = useParams()
 
   useEffect(() => {
@@ -42,7 +45,8 @@ const CensusData: FC<any> = () => {
     const id = params.geoid as string
     const vars = templateInfo.map(e => e.var)
     const geogType = params.type as string
-    const surveyType = templateInfo[0].survey
+    const surveyType = templateInfo[0].survey as SurveyType
+    setSurvey(surveyType)
     let countyFips
     if (geogType === 'tract') {
       countyFips = id.slice(2, 5)
@@ -60,19 +64,15 @@ const CensusData: FC<any> = () => {
     if (surveyType.includes('acs')) {
       const result = await axios.post('/api/data/acs', payload)
       console.log('result', JSON.parse(JSON.stringify(result)))
-      // const data: AcsResult[] = result.data
-      // for (const row of result.data) {
-      //   const perc = row.percent.toFixed(1)
-      //   row.estimate = row.estimate.toLocaleString()
-      //   row.percent = `${perc}%`
-      //   row.moe_perc = row.moe_perc !== undefined ? `${row.moe_perc.toFixed(1)}%` : null
-      //   row.moe = row.moe !== undefined ? row.moe.toLocaleString() : null
-      // }
       setCensusData(result.data)
       console.log('result!', result)
     } else if (surveyType === 'sf1') {
       // TODO implement decennial logic
       console.log('decennial data')
+      const result = await axios.post('/api/data/dec', payload)
+      const data = result.data.filter((e: any) => e.label !== 'Not defined for this file')
+      setCensusData(data)
+      console.log('result!', result)
     }
     console.log('payload', payload)
   }
@@ -81,9 +81,12 @@ const CensusData: FC<any> = () => {
 
   return (
     <div className={styles.CensusData} data-testid="CensusData">
-      <CensusDataTable
-        data={censusData}
-        showData={censusData.length > 0}/>
+      { survey !== undefined &&
+        <CensusDataTable
+          data={censusData}
+          type={survey}
+          showData={censusData.length > 0}/>
+      }
     </div>
   )
 }

@@ -42,7 +42,7 @@ data_dec_post <- function(req) {
   body <- req$body
 
   # now get the data
-  get_decennial(
+  data <- get_decennial(
     geography = body$geography,
     survey    = body$survey,
     variables = body$variables,
@@ -57,6 +57,18 @@ data_dec_post <- function(req) {
     ungroup() |>
     mutate(percent = 100 * (value / group_max), ) |>
     select(-NAME, -group_max, -var_group)
+
+  print(head(data))
+  # grab all variable names and query to get their descriptive names
+  variables_collapse = paste(data$variable, collapse = "','")
+  new_query = glue("
+    SELECT * FROM sf1_2010_vars
+    WHERE name IN ('{variables_collapse}');
+  ")
+  query_res = dbGetQuery(con, new_query) |> rename(variable = name)
+
+  # return the join with the descriptive information
+  left_join(data, query_res, 'variable')
 }
 
 # example calls

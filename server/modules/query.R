@@ -47,19 +47,8 @@ query_acs_post <- function(req) {
     mutate(
       percent = 100 * (estimate / group_max),
       moe_perc = 100 * (moe / estimate),
-      # label = str_c(
-      #   format(estimate, nsmall = 0, big.mark = ","),
-      #   glue('({percent}%)'),
-      #   if_else(
-      #     is.null(moe),
-      #     "",
-      #     glue('±{format(moe, nsmall=0, big.mark=",")}')
-      #   ),
-      #   sep = ' '
-      # )
       label = glue('{estimate};{percent};{moe}')
     ) |>
-    #  label = glue('{format(estimate, nsmall=0, big.mark=",")} ({percent}%) {if_else(is.NULL(moe), "", )}±{format(moe, nsmall=0, big.mark=",")}')) |>
     select(-NAME,-group_max,-var_group) |> 
     # pivot wider makes it easier for querying
     pivot_wider(values_from = c(estimate, percent, moe, moe_perc, label), names_from=variable) |>
@@ -78,11 +67,7 @@ query_acs_post <- function(req) {
   variables <- paste(body$variables, collapse = "','")
   query_res <- dbGetQuery(con, glue("SELECT * FROM acs5_2020_vars WHERE name IN ('{variables}')")) |>
     mutate(full_label = glue('{concept} - {label}'))
-  print('**********************')
-  print(query_res$name)
-  print('**********************')
   columns = colnames(data)
-  print(columns)
   for (column in columns) {
     stripped <- str_replace(column, 'estimate_|percent_|moe_perc_|moe_|label_', '')
     idx <- which(columns == column)
@@ -102,10 +87,6 @@ query_acs_post <- function(req) {
 
   geoids <- paste(data$geoid, collapse="','")
   get_geoids_statement = glue("select * from {body$geographyName} where geoid IN ('{geoids}')")
-  print(get_geoids_statement)
-  # st <- sf::st_read(con, query = get_geoids_statement)
-  # return (st)
-  # print(st)
 
   sf::st_read(con, query = get_geoids_statement) |>
     left_join(data, by = 'geoid') |>

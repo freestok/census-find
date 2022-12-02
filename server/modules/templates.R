@@ -32,12 +32,18 @@ templates_post <- function(con, req) {
     variables <- body$variables
     year <- body$year
 
-    collapsed <- paste(variables, collapse = '|')
+    collapsed <- paste(variables, collapse = '%|')
     query <- glue("
             SELECT name FROM {survey}_{variable_year}_vars
-            WHERE name ~* '{collapsed}'
+            WHERE name SIMILAR TO '{collapsed}%'
         ")
+
+    print('------------')
+    print(query)
+    print('------------')
     res <- dbGetQuery(con, query)
+
+    print(res)
     var_list <- vector(mode='list', length=length(res$name))
 
     # actually create template

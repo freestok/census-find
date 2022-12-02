@@ -28,12 +28,15 @@ interface AcsResult {
   tab: number
 }
 
+type SurveyType = 'acs5' | 'sf1'
 interface CensusDataTableProps {
   data: AcsResult[]
   showData: boolean
+  type: SurveyType
 }
 
-const TableGroup: FC<any> = ({ data }) => (
+// for ACS Data
+const ACSTableGroup: FC<any> = ({ data }) => (
   <>
     <Heading m={5}>{data[0].concept}</Heading>
     <TableContainer>
@@ -63,7 +66,34 @@ const TableGroup: FC<any> = ({ data }) => (
   </>
 )
 
-const CensusDataTable: FC<CensusDataTableProps> = ({ data, showData }) => {
+// for decennial data
+const DecTableGroup: FC<any> = ({ data }) => (
+  <>
+    <Heading m={5}>{data[0].concept}</Heading>
+    <TableContainer>
+      <Table variant='striped' colorScheme='gray'>
+        <Thead>
+          <Tr>
+            <Th>Variable</Th>
+            <Th>Value</Th>
+            <Th>Percent</Th>
+          </Tr>
+        </Thead>
+        <Tbody key={1}>
+          {data.map((row: any) => (
+            <Tr key={row.variable}>
+              <Td pl={4 + (row.tab * 6)}>{row.label}</Td>
+              <Td>{row.value?.toLocaleString()}</Td>
+              <Td>{row.percent?.toFixed(1)}%</Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
+    </TableContainer>
+  </>
+)
+
+const CensusDataTable: FC<CensusDataTableProps> = ({ data, showData, type }) => {
   const masterArray = []
   const uniqueConcepts = [...new Set(data.map(item => item.concept))]
 
@@ -85,9 +115,20 @@ const CensusDataTable: FC<CensusDataTableProps> = ({ data, showData }) => {
       </Stack>
     </Center>
       : null}
-    { masterArray.map(group => (
-      <TableGroup key={group[0].concept} data={group}/>
-    ))}
+
+      {type === 'acs5'
+        ? <>
+          {masterArray.map(group => (
+            <ACSTableGroup key={group[0].concept} data={group} />
+          ))}
+        </>
+        : <>
+          {masterArray.map(group => (
+            <DecTableGroup key={group[0].concept} data={group} />
+          ))}
+        </>
+    }
+
   </div>
   )
 }

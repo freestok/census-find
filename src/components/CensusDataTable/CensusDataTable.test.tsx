@@ -5,7 +5,7 @@ import CensusDataTable from './CensusDataTable'
 
 describe('<CensusDataTable />', () => {
   test('it should mount', () => {
-    render(<CensusDataTable data={[]} showData={true}/>)
+    render(<CensusDataTable data={[]} showData={true} type='acs5'/>)
 
     const censusDataTable = screen.getByTestId('CensusDataTable')
 
