@@ -31,6 +31,7 @@ import {
   IconButton,
   Icon,
   ButtonGroup,
+  Spinner,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
@@ -167,6 +168,7 @@ const Query: FC<any> = () => {
     const poly = JSON.parse(res.data[0])
     console.log('poly', poly)
     setGeojson(poly)
+    setQueryLoading(false)
   }
 
   const handleNumberInputChange = (event: any, index: number): void => {
@@ -234,6 +236,9 @@ const Query: FC<any> = () => {
                     disabled={(highLevelList.length < 1 || activeYear === undefined) && true}>
                     Run Query
                   </Button>
+                  {queryLoading &&
+                    <Spinner />
+                  }
                 </Stack>
                 <Divider />
 
