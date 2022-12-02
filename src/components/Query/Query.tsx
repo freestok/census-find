@@ -200,6 +200,7 @@ const Query: FC<any> = () => {
           {/* creation card */}
           <GridItem rowSpan={2} colSpan={2} py={6} ml={2}>
             <VariableList
+              activeDataset={activeDataset}
               setActiveDataset={setActiveDataset}
               setActiveYear={setActiveYear}
               setHighLevelList={setHighLevelList}

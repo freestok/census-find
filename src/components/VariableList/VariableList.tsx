@@ -30,7 +30,9 @@ import {
   IconButton,
   Icon,
   ButtonGroup,
-  Collapse
+  Collapse,
+  RadioGroup,
+  Radio
 } from '@chakra-ui/react'
 import axios from 'axios'
 
@@ -43,11 +45,19 @@ interface VariableListProps {
   title: string
   setFilteredData: React.Dispatch<any>
   setActiveDataset: React.Dispatch<any>
+  activeDataset: any
   setActiveYear: React.Dispatch<any>
   setHighLevelList: React.Dispatch<any>
   setActiveGeom?: React.Dispatch<any>
   activeGeom?: string
   setActiveState?: React.Dispatch<any>
+}
+
+interface VarInterface {
+  label: string
+  name: string
+  concept: string
+  disabled: boolean
 }
 
 interface VariableTableInterface {
@@ -79,7 +89,7 @@ const VariableTable: FC<VariableTableInterface> = ({ data, setHighLevelList, res
   const handleLoadMore = (): void => setMaxRecords(maxRecords + resultNumber)
   return (
     <Stack align='start'>
-      {data.slice(0, maxRecords).map((e: any) => (
+      {data.slice(0, maxRecords).map((e: VarInterface) => (
         <Button key={e.name} size='sm' overflow='hidden' textOverflow={'ellipsis'} colorScheme='blue' textAlign={'left'}
           value={e.concept} onClick={() => handleButtonClick(e)} disabled={e.disabled}>
           {resultStyle === 'all'
@@ -99,12 +109,13 @@ const VariableTable: FC<VariableTableInterface> = ({ data, setHighLevelList, res
 
 const VariableList: FC<VariableListProps> = ({
   shallow, resultStyle, resultNumber, filteredData,
-  setActiveDataset, setActiveYear, setHighLevelList,
+  setActiveDataset, setActiveYear, setHighLevelList, activeDataset,
   setFilteredData, title, setActiveGeom, setActiveState: setState, activeGeom
 }) => {
   const [years, setYears] = useState<any>()
   const [varList, setVarList] = useState<any>()
   const [config, setConfig] = useState<any>()
+  const [radioValue, setRadioValue] = useState('P')
   // const [filteredData, setFilteredData] = useState<any[]>([])
 
   const stateNames = ['AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI',
@@ -137,6 +148,10 @@ const VariableList: FC<VariableListProps> = ({
       row.disabled = false
     }
     setVarList(res.data)
+
+    if (activeDataset.name[0] === 'sf1') {
+      res.data = res.data.filter((e: VarInterface) => e.name[0] === radioValue)
+    }
     setFilteredData(res.data)
   }
 
@@ -151,8 +166,24 @@ const VariableList: FC<VariableListProps> = ({
 
   const handleSearchChange = (event: any): void => {
     const searchVal = event.target.value.toLowerCase()
-    // const data = censusNames[activeGeom]
-    const filtered = varList.filter((e: any) => (e.concept.toLowerCase().includes(searchVal)))
+    let filtered = activeDataset.name[0] === 'sf1'
+      ? varList.filter((e: VarInterface) => e.name[0] === radioValue)
+      : varList
+    filtered = filtered.filter((e: VarInterface) => {
+      const { concept, name, label } = e
+      const fullLabel: string = `${concept} - ${label}`
+      return fullLabel.toLowerCase().includes(searchVal) ||
+          name.toLowerCase().includes(searchVal) ||
+          concept.toLowerCase().includes(searchVal) ||
+          label.toLowerCase().includes(searchVal)
+    })
+    setFilteredData(filtered)
+  }
+
+  const radioGroupChange = (event: string): void => {
+    setRadioValue(event)
+    console.log('evvent', event)
+    const filtered = varList.filter((e: VarInterface) => e.name[0] === event)
     setFilteredData(filtered)
   }
 
@@ -226,6 +257,14 @@ const VariableList: FC<VariableListProps> = ({
           }
           <Collapse in={varList !== undefined} animateOpacity>
             <Heading size='md' mb={3}>Click a button to add to your {resultStyle === 'all' ? 'template' : 'query'}</Heading>
+            { activeDataset?.name[0] === 'sf1' &&
+              <RadioGroup onChange={radioGroupChange} value={radioValue}>
+                <Stack direction='row'>
+                  <Radio value='P'>Population</Radio>
+                  <Radio value='H'>Housing</Radio>
+                </Stack>
+              </RadioGroup>
+            }
             <Input
               // value={userSearch}
               onChange={handleSearchChange}

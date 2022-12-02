@@ -102,6 +102,7 @@ const Templates: FC<any> = () => {
             setActiveYear={setActiveYear}
             setHighLevelList={setHighLevelList}
             setFilteredData={setFilteredData}
+            activeDataset={activeDataset}
             filteredData={filteredData}
             shallow={true}
             resultNumber={100}

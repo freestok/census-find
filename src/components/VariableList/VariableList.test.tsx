@@ -11,6 +11,7 @@ describe('<VariableList />', () => {
               setHighLevelList={null as any}
               setFilteredData={null as any}
               filteredData={1}
+              activeDataset={''}
               title='test'/>)
 
     const variableList = screen.getByTestId('VariableList')
