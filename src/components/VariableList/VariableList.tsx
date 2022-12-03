@@ -32,7 +32,8 @@ import {
   ButtonGroup,
   Collapse,
   RadioGroup,
-  Radio
+  Radio,
+  Tooltip
 } from '@chakra-ui/react'
 import axios from 'axios'
 
@@ -51,6 +52,7 @@ interface VariableListProps {
   setActiveGeom?: React.Dispatch<any>
   activeGeom?: string
   setActiveState?: React.Dispatch<any>
+  setState?: React.Dispatch<any>
 }
 
 interface VarInterface {
@@ -93,8 +95,10 @@ const VariableTable: FC<VariableTableInterface> = ({ data, setHighLevelList, res
         <Button key={e.name} size='sm' overflow='hidden' textOverflow={'ellipsis'} colorScheme='blue' textAlign={'left'}
           value={e.concept} onClick={() => handleButtonClick(e)} disabled={e.disabled}>
           {resultStyle === 'all'
-            ? e.concept
-            : `${e.concept} - ${e.label}`
+            ? <Tooltip label={e.name} aria-label='A tooltip'>{e.concept}</Tooltip>
+            : <Tooltip label={e.name} aria-label='A tooltip'>
+               {`${e.concept} - ${e.label}`}
+              </Tooltip>
           }
         </Button>
       ))}
@@ -110,7 +114,7 @@ const VariableTable: FC<VariableTableInterface> = ({ data, setHighLevelList, res
 const VariableList: FC<VariableListProps> = ({
   shallow, resultStyle, resultNumber, filteredData,
   setActiveDataset, setActiveYear, setHighLevelList, activeDataset,
-  setFilteredData, title, setActiveGeom, setActiveState: setState, activeGeom
+  setFilteredData, title, setActiveGeom, setActiveState, activeGeom
 }) => {
   const [years, setYears] = useState<any>()
   const [varList, setVarList] = useState<any>()
@@ -148,8 +152,8 @@ const VariableList: FC<VariableListProps> = ({
       row.disabled = false
     }
     setVarList(res.data)
-
-    if (activeDataset.name[0] === 'sf1') {
+    console.log('activeDataset', activeDataset)
+    if (dataset.name[0] === 'sf1') {
       res.data = res.data.filter((e: VarInterface) => e.name[0] === radioValue)
     }
     setFilteredData(res.data)
@@ -157,6 +161,7 @@ const VariableList: FC<VariableListProps> = ({
 
   const datasetOnChange = (event: any): void => {
     const dataset = config.datasets[event.target.value]
+    console.log('dataset', dataset)
     setActiveDataset(dataset)
     setYears(dataset.years)
     getVariables(dataset)
@@ -219,7 +224,7 @@ const VariableList: FC<VariableListProps> = ({
               </Select>
             </Stack>
           }
-          {(setActiveGeom !== undefined && setState !== undefined) &&
+          {(setActiveGeom !== undefined && setActiveState !== undefined) &&
             <>
               <Stack direction={'row'} align={'center'}>
                 <DropdownLabel text='Geography Type:' />
@@ -233,7 +238,7 @@ const VariableList: FC<VariableListProps> = ({
               <Stack direction={'row'} align={'center'}
                 hidden={activeGeom === 'state'}>
                 <DropdownLabel text='State:' />
-                <Select onChange={(e: any): void => setState(e.target.value)}>
+                <Select onChange={(e: any): void => setActiveState(e.target.value)}>
                   <option key={'AL'} value={'AL'}>AL</option>
                   {stateNames.map(e => (
                     <option key={e} value={e}>{e}</option>
