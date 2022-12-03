@@ -43,7 +43,7 @@ cache_vars('pl', '2020', 1, con)
 # create the templates
 create_templates(con)
 
-# create the materialized views
+# NO LONGER NEEDED - create the materialized views
 cache_views('places', c('name', 'stusps'), con)
 cache_views('tracts', c('name', 'stusps'), con)
 cache_views('counties', c('name', 'stusps'), con)
