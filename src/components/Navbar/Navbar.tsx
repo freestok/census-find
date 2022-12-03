@@ -12,9 +12,18 @@ import {
   Center,
   Link,
   IconButton,
-  HStack
+  HStack,
+  Button,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Text
 } from '@chakra-ui/react'
-import { FaBars, FaQuestionCircle, FaWindowClose } from 'react-icons/fa'
+import { FaBars, FaGithub, FaQuestionCircle, FaWindowClose } from 'react-icons/fa'
 import { ColorModeSwitcher } from '../../ColorModeSwitcher'
 
 // interface NavbarProps {}
@@ -36,7 +45,7 @@ const NavLink: any = ({ children }: { children: string }) => (
 
 const Navbar: FC<any> = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()
-
+  const info = useDisclosure()
   return (
     <div className={styles.Navbar} data-testid="Navbar">
       <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
@@ -64,12 +73,20 @@ const Navbar: FC<any> = () => {
           <Flex alignItems={'center'}>
             <ColorModeSwitcher justifySelf='flex-end' />
             <IconButton
-              size={'md'}
+              size={'lg'}
               icon={<Center><FaQuestionCircle /></Center>}
               aria-label={'About Page'}
               color="current"
               variant="ghost"
-              onClick={() => alert('This about page does not exist...yet')}
+              onClick={info.onOpen}
+            />
+            <IconButton
+              size={'lg'}
+              icon={<Center><FaGithub /></Center>}
+              aria-label={'About Page'}
+              color="current"
+              variant="ghost"
+              onClick={(): void => { window.open('https://github.com/freestok/census-find') }}
             />
 
           </Flex>
@@ -86,6 +103,35 @@ const Navbar: FC<any> = () => {
             </Box>
             )
           : null}
+
+          {/* modal info */}
+        <Modal isOpen={info.isOpen} onClose={info.onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>About</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Stack>
+                <Text>
+                  <strong>Explore</strong>: Use this page to search for geographies via a table or map. Clicking on a geography will take you to its data. Data shown is dependent on your active template.
+                </Text>
+                <Text>
+                  <strong>Query</strong>: If you are looking for geographies that match certain criteria (e.g. all states with an urban population of at least 70%), then this is the page for you.
+                </Text>
+                <Text>
+                  <strong>Templates</strong>: Create templates to view the data you really want to see. Templates can consist of American Community Survey (ACS) or Decennial variables. Once created, you can view your templates in the Explore page.
+                </Text>
+
+              </Stack>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button colorScheme='blue' mr={3} onClick={info.onClose}>
+                Close
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </Box>
     </div>
   )
