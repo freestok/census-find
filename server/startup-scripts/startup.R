@@ -11,19 +11,21 @@ source("cache_materialized_views.R")
 source("create_templates.R")
 
 # get the environment variables
-readRenviron('.Renviron')
+readRenviron('.RenvironProd')
 
 # connect to the database
 db <- Sys.getenv("postgres_db")
 port <- Sys.getenv("postgres_port")
 user <- Sys.getenv("postgres_user")
 pw <- Sys.getenv("postgres_pw")
+host <- Sys.getenv("host")
 con <- dbPool(
   RPostgres::Postgres(),
   dbname = db,
   port = port,
   user = user,
-  password = pw
+  password = pw,
+  host = host
 )
 
 # cache the geoms

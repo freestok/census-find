@@ -8,12 +8,14 @@ get_con <- function() {
   port <- Sys.getenv("postgres_port")
   user <- Sys.getenv("postgres_user")
   pw <- Sys.getenv("postgres_pw")
+  host <- Sys.getenv("host")
   dbPool(
     RPostgres::Postgres(),
     dbname = db,
     port = port,
     user = user,
-    password = pw
+    password = pw,
+    host = host
   )
 }
 
