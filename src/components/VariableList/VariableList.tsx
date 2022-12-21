@@ -130,7 +130,7 @@ const VariableList: FC<VariableListProps> = ({
 
   const setVariablesFromConfig = async (): Promise<void> => {
     console.log('get variables')
-    const res = await axios.get('/api/config')
+    const res = await axios.get(`${process.env.REACT_APP_API}/config`)
     console.log('res', res)
     setConfig(res.data)
   }
@@ -144,7 +144,7 @@ const VariableList: FC<VariableListProps> = ({
       year: dataset.varYear[0],
       shallow
     }
-    const res = await axios.get('/api/variables', { params: parameters })
+    const res = await axios.get(`${process.env.REACT_APP_API}/variables`, { params: parameters })
     console.log('res.data', res.data)
 
     // res.data = res.data.map((e: any): any => e.disabled = false)

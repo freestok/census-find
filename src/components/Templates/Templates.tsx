@@ -61,7 +61,7 @@ const Templates: FC<any> = () => {
       survey: activeDataset.name[0],
       variableYear: activeDataset.varYear[0]
     }
-    // const result = await axios.post('/api/templates', payload)
+    // const result = await axios.post('${process.env.REACT_APP_API}/templates', payload)
     console.log('payload', payload)
     postTemplate(payload)
       .then(() => {
@@ -81,7 +81,7 @@ const Templates: FC<any> = () => {
   }
 
   const postTemplate = async (payload: any): Promise<void> => {
-    const result = await axios.post('/api/templates', payload)
+    const result = await axios.post(`${process.env.REACT_APP_API}/templates`, payload)
     console.log('result', result)
   }
 

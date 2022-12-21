@@ -48,7 +48,7 @@ const ExploreMap: FC<ExploreMapProps> = ({ activeGeom, activeState, template }) 
       type: geomMapper[activeGeom],
       state: activeState
     }
-    const res = await axios.get('/api/geom', { params: queryParams })
+    const res = await axios.get(`${process.env.REACT_APP_API}/geom`, { params: queryParams })
     const polygons = JSON.parse(res.data[0])
     // let data = {}
     // data['type'] = 'FeatureCollection'

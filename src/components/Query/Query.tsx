@@ -160,9 +160,9 @@ const Query: FC<any> = () => {
     console.log('params', params)
     let res
     if (survey === 'acs5') {
-      res = await axios.post('/api/query/acs', params)
+      res = await axios.post(`${process.env.REACT_APP_API}/query/acs`, params)
     } else { // decennial
-      res = await axios.post('/api/query/dec', params)
+      res = await axios.post(`${process.env.REACT_APP_API}/query/dec`, params)
     }
     console.log('res', res)
     const poly = JSON.parse(res.data[0])

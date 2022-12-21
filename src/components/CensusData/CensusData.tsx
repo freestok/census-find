@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 import React, { FC, useEffect, useState } from 'react'
 import styles from './CensusData.module.scss'
@@ -33,7 +34,7 @@ const CensusData: FC<any> = () => {
   const getCensusData = async (): Promise<void> => {
     console.log('useEffect triggered!!!')
     const templateId = searchParams.get('template') as string
-    const res = await axios.get(`/api/templates/${templateId}`)
+    const res = await axios.get(`${process.env.REACT_APP_API}/templates/${templateId}`)
     const templateInfo: TemplateInfo[] = res.data
 
     // TODO let there be mixed years within a template
@@ -62,14 +63,14 @@ const CensusData: FC<any> = () => {
     }
     console.log('surveyType', surveyType)
     if (surveyType.includes('acs')) {
-      const result = await axios.post('/api/data/acs', payload)
+      const result = await axios.post(`${process.env.REACT_APP_API}/data/acs`, payload)
       console.log('result', JSON.parse(JSON.stringify(result)))
       setCensusData(result.data)
       console.log('result!', result)
     } else if (surveyType === 'sf1') {
       // TODO implement decennial logic
       console.log('decennial data')
-      const result = await axios.post('/api/data/dec', payload)
+      const result = await axios.post(`${process.env.REACT_APP_API}/data/dec`, payload)
       const data = result.data.filter((e: any) => e.label !== 'Not defined for this file')
       setCensusData(data)
       console.log('result!', result)

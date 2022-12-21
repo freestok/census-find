@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 import {
   Grid,
@@ -67,14 +68,14 @@ const Explore: FC<any> = () => {
     }))
   }
   const getGeographyNames = async (): Promise<void> => {
-    await getGeomInfo('/api/geom/names/states', 'state')
-    await getGeomInfo('/api/geom/names/counties', 'county')
-    await getGeomInfo('/api/geom/names/places', 'place')
-    await getGeomInfo('/api/geom/names/tracts', 'tract')
+    await getGeomInfo(`${process.env.REACT_APP_API}/geom/names/states`, 'state')
+    await getGeomInfo(`${process.env.REACT_APP_API}/geom/names/counties`, 'county')
+    await getGeomInfo(`${process.env.REACT_APP_API}/geom/names/places`, 'place')
+    await getGeomInfo(`${process.env.REACT_APP_API}/geom/names/tracts`, 'tract')
   }
 
   const getTemplates = async (): Promise<void> => {
-    const res = await axios.get('/api/templates/all')
+    const res = await axios.get(`${process.env.REACT_APP_API}/templates/all`)
     const data: Templates[] = res.data
     setTemplates(data)
     if (data[0] !== undefined) {
