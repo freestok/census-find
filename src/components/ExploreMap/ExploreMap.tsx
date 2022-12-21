@@ -50,6 +50,18 @@ const ExploreMap: FC<ExploreMapProps> = ({ activeGeom, activeState, template }) 
     }
     const res = await axios.get('/api/geom', { params: queryParams })
     const polygons = JSON.parse(res.data[0])
+    // let data = {}
+    // data['type'] = 'FeatureCollection'
+    // features = [];
+    // for (let i of res) {
+    //   let tempD = {}
+    //   tempD['type'] = 'Feature'
+    //   let {st_asgeojson, geometry, ...rest} = i;
+    //   tempD['geometry'] = st_asgeojson;
+    //   tempD['properties'] = rest;
+    //   features.push(tempD)
+    // }
+    // data['features'] = features;
     setGeojson(polygons)
 
     // set bounds
