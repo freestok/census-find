@@ -123,7 +123,9 @@ const Navbar: FC<any> = () => {
                 <Text>
                   <strong>Templates</strong>: Create templates to view the data you really want to see. Templates can consist of American Community Survey (ACS) or Decennial variables. Once created, you can view your templates in the Explore page.
                 </Text>
-
+                <Link href='https://www.youtube.com/watch?v=Jf0zjedFfbA'>
+                  View a video run-through on this app.
+                </Link>
               </Stack>
             </ModalBody>
 
