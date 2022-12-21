@@ -21,7 +21,8 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Text
+  Text,
+  Heading
 } from '@chakra-ui/react'
 import { FaBars, FaGithub, FaQuestionCircle, FaWindowClose } from 'react-icons/fa'
 import { ColorModeSwitcher } from '../../ColorModeSwitcher'
@@ -70,6 +71,7 @@ const Navbar: FC<any> = () => {
               ))}
             </HStack>
           </HStack>
+          <Heading>Census Find</Heading>
           <Flex alignItems={'center'}>
             <ColorModeSwitcher justifySelf='flex-end' />
             <IconButton

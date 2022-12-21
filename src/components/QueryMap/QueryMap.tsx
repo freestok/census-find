@@ -19,8 +19,8 @@ interface PopupInterface {
 const PopupInfo: FC<PopupInterface> = ({ feature }) => (
   <>
     {Object.keys(feature).map((group: any) => (
-      <>
-        <Center key={group}>
+      <div key={group}>
+        <Center>
           <Heading size='md'>
             {group}
           </Heading>
@@ -34,7 +34,7 @@ const PopupInfo: FC<PopupInterface> = ({ feature }) => (
           {/* {JSON.stringify(feature[group])} */}
           {/* {feature[group][0]}: {feature[group][1]} {feature[group][2]} */}
         </Stack>
-      </>
+      </div>
     ))}
   </>
 )
@@ -57,11 +57,12 @@ const QueryMap: FC<QueryMapProps> = ({ geojson }) => {
   }
 
   const onHover = useCallback((event: any) => {
-    const {
-      features,
-      point: { x, y }
-    } = event
-
+    const features = event?.features
+    const x = event.point?.x
+    const y = event.point?.y
+    if (y == null || x == null) {
+      return
+    }
     let concept: any
     let previousKey = ''
     if (features.length > 0) {

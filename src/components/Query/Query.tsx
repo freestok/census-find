@@ -234,7 +234,9 @@ const Query: FC<any> = () => {
                   </Select>
                   <Button colorScheme='green' width='7em' mb={3}
                     onClick={handleQueryClick}
-                    disabled={(highLevelList.length < 1 || activeYear === undefined) && true}>
+                    disabled={
+                      (highLevelList.length < 1 || activeYear === undefined || operators.length === 0)
+                    }>
                     Run Query
                   </Button>
                   {queryLoading &&
